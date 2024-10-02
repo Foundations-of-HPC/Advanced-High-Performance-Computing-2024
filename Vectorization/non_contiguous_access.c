@@ -22,35 +22,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 //#include <time.h>
 
-#define INTEGER 0
-#define FPSP 1
+typedef unsigned int uint;
 
-#if (DTYPE==INTEGER)
-
-#warning "using INT32"
-#define dtype uint32_t
-#define myRAND lrand48()
-
-#elif (DTYPE==FPSP)
-
-#warning "using FLOAT"
-#define dtype float
-#define myRAND drand48()
-
-#endif
-
-typedef uint32_t uint;
-
-dtype sum_loop ( dtype *, uint );
-
-
-dtype sum_loop ( dtype *array, uint N )
+uint sum_loop ( uint *array, uint N, int stride )
 {
-  dtype sum = 0;
-  for ( uint32_t i = 0; i < N; i++ )
+  uint sum = 0;
+  for ( uint i = 0; i < N; i+=stride )
     sum += array[i];
   return sum;
 }                                       
@@ -59,18 +38,19 @@ dtype sum_loop ( dtype *array, uint N )
 int main ( int argc, char **argv )
 {
 
-  uint32_t N = ( (argc > 1)? (uint)atoi(*(argv+1)) : 1000000 );
-
-  dtype *array = (dtype*)malloc( sizeof(dtype) * N );
+  uint N      = ( (argc > 1)? (uint)atoi(*(argv+1)) : 1000000 );
+  int  stride = ( (argc > 2)? atoi(*(argv+2)) : 1 );
+  
+  uint *array = (uint*)malloc( sizeof(uint) * N );
   
   //srand48( time(NULL) );
   for ( uint i = 0; i < N; i++ )
-    array[i] = (dtype)i;
-  //array[i] = (dtype)myRAND;
+    array[i] = (uint)i;
+  //array[i] = (uint)myRAND;
 
-  dtype sum = sum_loop( array, N );
+  uint sum = sum_loop( array, N, stride );
 
-  printf ( "final result is: %g\n", (double) sum );
+  printf ( "final result is: %u\n", sum );
 
   free ( array );
   

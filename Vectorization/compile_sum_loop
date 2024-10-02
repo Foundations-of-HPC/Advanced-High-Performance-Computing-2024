@@ -1,0 +1,57 @@
+
+
+# ···············································································
+#  compile
+# ×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
+
+# compile the integer version with vectorization
+gcc -DDTYPE=INTEGER -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized \
+-o sum_loop.int sum_loop.c
+
+# compile the integer version with NO vectorization
+gcc -DDTYPE=INTEGER -O2 -o sum_loop.int.novec sum_loop.c
+
+# compile the float version with vectorization
+gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops \
+-opt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized 
+-o sum_loop.float sum_loop.c
+
+# compile the float version with vectorization AND unsafe-math
+gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized \
+-o sum_loop.float.unsafe sum_loop.c -funsafe-math-optimizations
+
+# compile the float version with NO vectorization
+gcc -DDTYPE=FPSP -O2 -o sum_loop.float.novec sum_loop.c
+
+# ···············································································
+#   get analysis via llvm-mca
+# ×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
+
+clang -S -fverbose-asm -DDTYPE=INTEGER -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_int_vect
+
+clang -S -fverbose-asm -DDTYPE=INTEGER -O2 \
+sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_int_novect
+
+clang -S -fverbose-asm -DDTYPE=FPSP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_vect
+
+clang -S -fverbose-asm -DDTYPE=FPSP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_vect_unsafe -funsafe-math-optimizations
+
+clang -S -fverbose-asm -DDTYPE=FPSP -O2 \
+sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_novect
+
+
+# ···············································································
+#   perf
+# ×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
+
+taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/int_vec_retired.add_256/ ./sum_loop.int
+
+taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/fp_arith_inst_retired.256b_packed_single/,cpu_core/fp_arith_inst_retired.scalar_single/ ./sum_loop.float
