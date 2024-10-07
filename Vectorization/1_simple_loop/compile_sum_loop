@@ -7,8 +7,8 @@
 # compile the integer version with vectorization
 gcc -DDTYPE=INTEGER -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
--fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized \
--o sum_loop.int sum_loop.c
+-o sum_loop.int sum_loop.c \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
 # compile the integer version with NO vectorization
 gcc -DDTYPE=INTEGER -O2 -o sum_loop.int.novec sum_loop.c
@@ -16,14 +16,14 @@ gcc -DDTYPE=INTEGER -O2 -o sum_loop.int.novec sum_loop.c
 # compile the float version with vectorization
 gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
--opt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized 
--o sum_loop.float sum_loop.c
+-o sum_loop.float sum_loop.c \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
 # compile the float version with vectorization AND unsafe-math
 gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
--fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized \
--o sum_loop.float.unsafe sum_loop.c -funsafe-math-optimizations
+-o sum_loop.float.unsafe sum_loop.c -funsafe-math-optimizations \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
 # compile the float version with NO vectorization
 gcc -DDTYPE=FPSP -O2 -o sum_loop.float.novec sum_loop.c
