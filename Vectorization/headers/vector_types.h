@@ -72,6 +72,7 @@
 #define VSIZE (sizeof(double))
 #endif
 
+#endif
 
 // --------------------------------------------------------
 //  VSIZE has been either given or discovered
@@ -81,7 +82,7 @@
 #error "the defined vector size is not a power of 2"
 #endif
 
-#if (VSIZE<=sizeof(double))
+#if (VSIZE <= 8)
 
 #define NO_VECTOR
 #warning "no vector capability found"
@@ -91,18 +92,27 @@ typedef int ivector_t;
 
 #define DVSIZE 1
 #define FVSIZE 1
-#define IVSIZE 1
+#define ILLVSIZE 1
+#define VALIGN 32
 
 #else
 
 
-#define DVSIZE (VSIZE / sizeof(double))
-#define FVSIZE (VSIZE / sizeof(float))
-#define IVSIZE (VSIZE / sizeof(int))
+#define DVSIZE  (VSIZE / sizeof(double))
+#define FVSIZE  (VSIZE / sizeof(float))
+#define IVSIZE  (VSIZE / sizeof(int))
+#define LLVSIZE (VSIZE / sizeof(int))
+#define VALIGN  (VSIZE)
 
-typedef double dvector_t __attribute__((vector_size (VSIZE)));
-typedef float  fvector_t __attribute__((vector_size (VSIZE)));
-typedef int    ivector_t __attribute__((vector_size (VSIZE)));
+
+typedef double    dvector_t  __attribute__((vector_size (VSIZE)));
+typedef union { dvector_t V;  double    v[DVSIZE]; } dvector_u;
+typedef float     fvector_t  __attribute__((vector_size (VSIZE)));
+typedef union { fvector_t V;  float     v[FVSIZE]; } fvector_u;
+typedef int       ivector_t  __attribute__((vector_size (VSIZE)));
+typedef union { ivector_t V;  int       v[IVSIZE]; } ivector_u;
+typedef long long llvector_t __attribute__((vector_size (VSIZE)));
+typedef union { llvector_t V; long long v[LLVSIZE];} llvector_u;
 
 
 #endif

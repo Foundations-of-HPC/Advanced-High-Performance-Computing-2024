@@ -29,31 +29,34 @@ if [ ! -f ${DIR}/vector_pragmas.h ]; then cp -d ../vector_pragmas.h ${DIR}/ ; fi
 
 echo "compile with options " ${OPTIMIZATION} ${VECTORIZATION}
 
-$mycc ../test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}
-$mycc ../test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath
+$mycc test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}
+$mycc test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath
 
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY ../test.c ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wm
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY ../test.c ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath.wm
+$mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wm
+$mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath.wm
 
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ../test.c ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wam
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ../test.c ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath.wam
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY -DUNALIGN_MEMORY ../test.c ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wum
+$mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wam
+$mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${MATH} -o ${EXEC}.assmath.wam
+if [ ${mycase} != 2 ]; then
+    $mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY -DUNALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} -o ${EXEC}.wum
+fi
 
 # ======================================================================
 
 echo "compile with trace infos for flame graphs.."
 
-$mycc ../test.c -DCASE=${mycase} ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace.wam
-$mycc ../test.c -DCASE=${mycase} -DWARMUP_MEMORY -DUNALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace.wum
-$mycc ../test.c  -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${MATH} ${TRACE} -o ${EXEC}.trace.assmath.wam
-
+$mycc test.c -DCASE=${mycase} ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace
+$mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace.wam
+$mycc test.c  -DCASE=${mycase} -DWARMUP_MEMORY -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${MATH} ${TRACE} -o ${EXEC}.trace.assmath.wam
+if [ ${mycase} != 2 ]; then
+    $mycc test.c -DCASE=${mycase} -DWARMUP_MEMORY -DUNALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${TRACE} -o ${EXEC}.trace.wum
+fi
 # ======================================================================
 
 echo "output assembly " 
-$mycc ../test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${ASM} -o ${EXEC}.s
-$mycc ../test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${MATH} ${ASM} -o ${EXEC}.assmath.s
-$mycc ../test.c -DCASE=${mycase}  -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${ASM} -o ${EXEC}.align.s
+$mycc test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${ASM} -o ${EXEC}.s
+$mycc test.c -DCASE=${mycase}  ${OPTIMIZATION} ${VECTORIZATION} ${MATH} ${ASM} -o ${EXEC}.assmath.s
+$mycc test.c -DCASE=${mycase}  -DALIGN_MEMORY ${OPTIMIZATION} ${VECTORIZATION} ${ASM} -o ${EXEC}.align.s
 
 
 # ======================================================================
@@ -72,9 +75,11 @@ echo
 echo "warm-up align. mem - -- -- -- -- -- -- --"
 ./${EXEC}.wam $N
 echo
-echo "warm-up unalign mem  -- -- -- -- -- -- --"
-./${EXEC}.wum $N
-echo
+if [ ${mycase} != 2 ]; then
+    echo "warm-up unalign mem  -- -- -- -- -- -- --"
+    ./${EXEC}.wum $N
+    echo
+fi
 echo "assmath + wup align mem -- -- -- -- -- --"
 ./${EXEC}.assmath.wam $N
 echo
@@ -89,11 +94,14 @@ taskset -c 2 perf stat -e cycles:u,instructions:u,fp_arith_inst_retired.scalar_d
 
 taskset -c 2 perf stat -e cycles:u,instructions:u,fp_arith_inst_retired.scalar_double:u,fp_arith_inst_retired.vector:u,faults:u ./${EXEC}.wam ${N}
 
+if [ ${mycase} != 2 ]; then
+    taskset -c 2 perf stat -e cycles:u,instructions:u,fp_arith_inst_retired.scalar_double:u,fp_arith_inst_retired.vector:u,faults:u ./${EXEC}.wum ${N}
+fi
+
 taskset -c 2 perf stat -e cycles:u,instructions:u,fp_arith_inst_retired.scalar_double:u,fp_arith_inst_retired.vector:u,faults:u ./${EXEC}.assmath.wam ${N}
 
-taskset -c 2 perf stat -e cycles:u,instructions:u,fp_arith_inst_retired.scalar_double:u,fp_arith_inst_retired.vector:u,faults:u ./${EXEC}.wum ${N}
-
-
+cd ..
+exit
 # ======================================================================
 
 echo "··································································"
@@ -123,14 +131,15 @@ rm -f ${CGRAPH}${SUFF} ${CGRAPH}${SUFF}.folded
 #
 # ++++++++++++++++++++++++++++++
 #
-echo -e "\t warm-up & unalignment.."
-SUFF=.wum
-perf record -F1000 -g --call-graph fp,1024 -o ${CGRAPH}${SUFF} ./${EXEC}.trace${SUFF} ${N}
-perf script -i ${CGRAPH}${SUFF} | ~/Downloads/FlameGraph-master/stackcollapse-perf.pl > ${CGRAPH}${SUFF}.folded
-~/Downloads/FlameGraph-master/flamegraph.pl ${CGRAPH}${SUFF}.folded > ${CGRAPH}${SUFF}.svg
-
-rm -f ${CGRAPH}${SUFF} ${CGRAPH}${SUFF}.folded
-
+if [ ${mycase} != 2 ]; then
+    echo -e "\t warm-up & unalignment.."
+    SUFF=.wum
+    perf record -F1000 -g --call-graph fp,1024 -o ${CGRAPH}${SUFF} ./${EXEC}.trace${SUFF} ${N}
+    perf script -i ${CGRAPH}${SUFF} | ~/Downloads/FlameGraph-master/stackcollapse-perf.pl > ${CGRAPH}${SUFF}.folded
+    ~/Downloads/FlameGraph-master/flamegraph.pl ${CGRAPH}${SUFF}.folded > ${CGRAPH}${SUFF}.svg
+    
+    rm -f ${CGRAPH}${SUFF} ${CGRAPH}${SUFF}.folded
+fi
 #
 # ++++++++++++++++++++++++++++++
 #

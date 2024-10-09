@@ -1,32 +1,94 @@
 
+# how to get assembly
+#
+# gcc -S -fasm-verbose-assembler-masm=intel
+
+
 
 # ···············································································
+#  [ 1 ] compare the effect of the auto-vectorization between integer and FP
+#
+#  a. compare sum.loop.c DTYPE=INTEGER + vectorization with DTYPE=FP + vectorization
+#
+#     --> we learn that integers can be reshuffled easily and the vectorization is
+#         much more effective. That is due to the constraints from IEEE arith. on
+#         the critical paths
+#
+#  [ 2 ] compare the effect of auto-vectorization when DTYPE=FP
+#
+#  b. compare sum_loop.c with and w/o vectorization
+#     --> check that the vectorization is not complete, both inspecting the assembler
+#         and from perf results
+#
+#  c. compare sum_loop.c with vectorization and w/o unsafe-math
+#     --> check that with "unsafe math" the compiler can vectorize much better due
+#         to the reshuffling of the operations
+#
+#  [ 3 ] compare the effect of vectorization with unsafe-math and with
+#        unrolling-by-hand (sum_loop.unroll.c)
+#
+#  d. compare sum_loop.c + vectorization+unsafe-math with sum_loop.unroll.c + vectorization
+#
+#     --> the vectorization achieved from an unrolled loop (with separated accumulator,
+#         that could not be done automatically by the compilar with loop unrolling) is
+#         equivalent to that achieved from the original loop with "unsafe math".
+#
+# ×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
+
+
+
+# ···············································································
+#
 #  compile
 # ×××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××××
 
 # compile the integer version with vectorization
+#
+
 gcc -DDTYPE=INTEGER -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
 -o sum_loop.int sum_loop.c \
 -fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
 # compile the integer version with NO vectorization
+#
+
 gcc -DDTYPE=INTEGER -O2 -o sum_loop.int.novec sum_loop.c
 
+
 # compile the float version with vectorization
-gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
+#
+
+gcc -DDTYPE=FPDP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
 -o sum_loop.float sum_loop.c \
 -fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
+
 # compile the float version with vectorization AND unsafe-math
-gcc -DDTYPE=FPSP -O3 -march=native -mtune=native \
+#
+
+gcc -DDTYPE=FPDP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops \
 -o sum_loop.float.unsafe sum_loop.c -funsafe-math-optimizations \
 -fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
 
+
 # compile the float version with NO vectorization
-gcc -DDTYPE=FPSP -O2 -o sum_loop.float.novec sum_loop.c
+#
+
+gcc -DDTYPE=FPDP -O2 -o sum_loop.float.novec sum_loop.c
+
+
+# compile the unrolled float version with vectorization
+#
+
+gcc -DDTYPE=FPDP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops \
+-o sum_loop.float.unroll sum_loop.unroll.c \
+-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop-optimized -fopt-info-loop-missed
+
+
 
 # ···············································································
 #   get analysis via llvm-mca
@@ -38,13 +100,16 @@ clang -S -fverbose-asm -DDTYPE=INTEGER -O3 -march=native -mtune=native \
 clang -S -fverbose-asm -DDTYPE=INTEGER -O2 \
 sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_int_novect
 
-clang -S -fverbose-asm -DDTYPE=FPSP -O3 -march=native -mtune=native \
+clang -S -fverbose-asm -DDTYPE=FPDP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_vect
 
-clang -S -fverbose-asm -DDTYPE=FPSP -O3 -march=native -mtune=native \
+clang -S -fverbose-asm -DDTYPE=FPDP -O3 -march=native -mtune=native \
+-ftree-vectorize  -funroll-loops sum_loop.unroll.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_unroll_vect
+
+clang -S -fverbose-asm -DDTYPE=FPDP -O3 -march=native -mtune=native \
 -ftree-vectorize  -funroll-loops sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_vect_unsafe -funsafe-math-optimizations
 
-clang -S -fverbose-asm -DDTYPE=FPSP -O2 \
+clang -S -fverbose-asm -DDTYPE=FPDP -O2 \
 sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_float_novect
 
 
@@ -55,3 +120,7 @@ sum_loop.c -masm=intel -o - | llvm-mca -iterations=100 -timeline > analysis_floa
 taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/int_vec_retired.add_256/ ./sum_loop.int
 
 taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/fp_arith_inst_retired.256b_packed_single/,cpu_core/fp_arith_inst_retired.scalar_single/ ./sum_loop.float
+
+taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/fp_arith_inst_retired.256b_packed_single/,cpu_core/fp_arith_inst_retired.scalar_single/ ./sum_loop.float.unsafe
+
+taskset -c 1 perf stat -C 1 -e cpu_core/cpu-cycles/,cpu_core/instructions/,cpu_core/fp_arith_inst_retired.256b_packed_single/,cpu_core/fp_arith_inst_retired.scalar_single/ ./sum_loop.float.unroll

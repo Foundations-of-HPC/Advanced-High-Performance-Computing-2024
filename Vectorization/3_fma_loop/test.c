@@ -79,7 +79,7 @@ double __attribute__ ((noinline)) process ( double *restrict A, double *restrict
 
   double asum[4] = {0};
   int i          = 0;
-  int N_4        = ((N/4)*4);
+  int N_4        = ((N/4)*4)&0xFFFFFFFC;
   /*
   N_4 = N&0xFFFFFFFC;
   //N_4 __attribute((__assume(N_4 % 4 == 0)));
@@ -122,9 +122,8 @@ double __attribute__ ((noinline)) process ( double *restrict A, double *restrict
   v4df *vC = (v4df *)C;
  #endif
   v4df vsum = {0};
-  int N4  = N/4;
+  int N4  = (N/4)&0xFFFFFFFC;;
 
-  __assume(N4 % 4 == 0);
   for ( int i = 0 ; i < N4; i++ )
     vsum += vA[i] * vB[i] + vC[i];
 
