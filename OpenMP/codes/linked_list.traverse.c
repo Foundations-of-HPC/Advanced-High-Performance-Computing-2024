@@ -624,13 +624,13 @@ int main ( int argc, char **argv )
 	if ( N == 0 )
 	  exit(mode);
     
-	if ( mode == 0 )
+	if ( mode == 0 ) {
 	  ActiveThreshold = (1-fraction)*cutoff;
-	else if ( mode == 1 )
+	  MaxLimit = (MaxLimit == 0 ? cutoff : MaxLimit); }
+	else if ( mode == 1 )  {	  
 	  ActiveThreshold = cutoff-range + 2*range*(1-fraction);
-
-	if ( MaxLimit == 0 )
-	  MaxLimit = cutoff;
+	  MaxLimit = (MaxLimit == 0 ? cutoff : cutoff+range); }
+	  
 	
 	printf ( " > building the nodes.. " );
 	timing = CPU_TIME;
@@ -707,7 +707,7 @@ int main ( int argc, char **argv )
   timing = CPU_TIME - timing;
   printf ( "%u active nodes found (took %g seconds)\n", Nactive, (double)timing/1e9 );
 
-  if ( Nactive < 0 )
+  if ( Nactive <= 0 )
     {
       delete ( head );
       exit(0);
