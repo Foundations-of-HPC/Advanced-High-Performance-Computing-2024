@@ -86,6 +86,7 @@ int clashes;
 // prototypes
 //
 
+
 llnode_t* get_head        ( llnode_t *);
 int       walk            ( llnode_t *);
 int       delete          ( llnode_t * );

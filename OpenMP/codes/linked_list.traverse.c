@@ -128,13 +128,13 @@ uint  MaxLimit;
 
 
 inline llnode_t *create_node         ( uint, llnode_t *, llnode_t * );
-uint      load_nodes_and_build_list  ( llnode_t **, char*, int *, uint *, uint * );
+       uint      load_nodes_and_build_list  ( llnode_t **, char*, int *, uint *, uint * );
        uint      find                ( llnode_t *, uint, llnode_t ** restrict, llnode_t ** restrict );
        uint      find_and_insert     ( llnode_t **, uint );
 
 inline int       is_active           ( uint );
-void      process_nodes_group ( llnode_t * restrict * restrict, uint);
-ull       process_node        ( llnode_t * restrict, uint );
+       void      process_nodes_group ( llnode_t * restrict * restrict, uint);
+       ull       process_node        ( llnode_t * restrict, uint );
 
        llnode_t *get_head            ( llnode_t * restrict );
        int       delete              ( llnode_t * restrict );
@@ -642,7 +642,7 @@ int main ( int argc, char **argv )
 	    if ( res < 0 )
 	      break;
 	    if ( i % i_10 == 0 )
-	      printf("%u%%.. ", 10*i/i_10);
+	      printf("%u%%.. ", 10*i/i_10); fflush(stdout);
 	  }
 	timing = CPU_TIME - timing;
 	printf ( "took %g seconds\n", timing/1e9);	

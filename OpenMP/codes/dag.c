@@ -291,10 +291,10 @@ int main ( int argc, char **argv )
       dag.N = (uint)(atoi(*(argv+a)));
       if ( argc > ++a ) {
 	dag.N_roots = (uint)(dag.N * (float)(atof(*(argv+a)))+1);
-	if ( argc >= ++a ) {
+	if ( argc > ++a ) {
 	  dag.min_children = (uint)(atoi(*(argv+a)));
 	  dag.max_children = (uint)(atoi(*(argv+ (++a))));
-	  if ( argc >= ++a )
+	  if ( argc > ++a )
 	    dag.workload = (uint)(atoi(*(argv+a)));
 	} } } }
 
