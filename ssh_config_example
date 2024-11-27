@@ -1,0 +1,8 @@
+Host leonardo
+     #Hostname login01-ext.leonardo.cineca.it
+     Hostname login.leonardo.cineca.it
+     User ltornato
+     IdentityFile ~/.ssh/keys/id_rsa_cineca
+     StrictHostKeyChecking no
+     ServerAliveCountMax 20
+     ServerAliveInterval 15
