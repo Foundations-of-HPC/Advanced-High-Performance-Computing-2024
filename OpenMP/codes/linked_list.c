@@ -27,7 +27,7 @@ typedef unsigned long long ull;
 int me;
 #pragma omp threadprivate(me)
 
-#define CPU_TIME ({ struct timespec ts; (clock_gettime( CLOCK_REALTIME, &ts ), \
+#define CPU_TIME ({ struct timespec ts; (clock_gettime( CLOCK_TAI, &ts ), \
 					 (ull)ts.tv_sec * 1000000000 +	\
 					 (ull)ts.tv_nsec); })
 
@@ -44,10 +44,10 @@ int me;
 
 
 #if defined(DEBUG)
-#define TIMESTAP (CPU_TIME % TIME_CUT)
+#define TIMESTAMP (CPU_TIME % TIME_CUT)
 #define dbgout(...) printf( __VA_ARGS__ );
 #else
-#define TIMESTAP
+#define TIMESTAMP
 #define dbgout(...) 
 #endif
 
@@ -365,7 +365,7 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
 		 (prev!=NULL?prev->data:-1),(next->prev!=NULL?(next->prev)->data:-1) );
 
 	  if (prev != NULL)
-	    // free the lock on the old next
+	    // free the lock on the old prev
 	    omp_unset_lock(&(prev->lock));
 
 	  dbgout("[ %llu ]\t\t>> T %d V %d restart from %d to walk back\n",
@@ -400,10 +400,12 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
   if ( new == NULL )
     return -2;
   
+  
+  omp_init_lock( &(new->lock) );
+  omp_set_lock( &(new->lock) );
   new->data = value;
   new->prev = prev;
   new->next = next;
-  omp_init_lock( &(new->lock) );
   if ( prev != NULL )
     prev->next = new;
   if ( next != NULL)
@@ -421,6 +423,8 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
     dbgout("[ %llu ]\tthread %d processing %d releases lock for %d\n",
 	   TIMESTAMP, me, value, next->data);}
 
+  omp_unset_lock(&(new->lock));
+  
   dbgout("T %d V %d has done\n", me, value);
   return 0;
 }
@@ -473,7 +477,7 @@ int main ( int argc, char **argv )
 
  #else
 
-  #pragma omp parallel
+ #pragma omp parallel
   {
     me = omp_get_thread_num();
     #pragma omp single
@@ -483,7 +487,7 @@ int main ( int argc, char **argv )
 
       while ( n < N )
 	{
-	  int new_value = rand();
+	  int new_value = rand() % 10000;
 
 	 #pragma omp task
 	  find_and_insert_parallel( head, new_value, mode );
