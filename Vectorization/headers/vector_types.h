@@ -22,8 +22,20 @@
  │                                                                            │
  + ────────────────────────────────────────────────────────────────────────── */
 
-
 /* @ ······················································· @
+   :                                                         :
+   : NOTE: this headers files are just a toy-lab to          :
+   :       introduce students to the matter with very simple :
+   :       materials.                                        :
+   :       To go deeper in that, or for production visit:    :
+   :       - vector class:                                   :  
+   :         https://github.com/vectorclass/version2/tree/master
+   :       - highway:                                        :
+   :         https://github.com/google/highway               :
+   :                                                         :
+   :                                                         :
+   : - - - - - - - - - - - - - - - - - - - - - - - - - - - - :
+   :                                                         :
    :  We attempt here to uniquely define "our" vector types  :
    :  not using intrinsics but the custom vector types.      :
    :  We exploit the fact that the                           :
@@ -125,7 +137,7 @@ typedef int ivector_t;
 #define DVSIZE  (VSIZE / sizeof(double))
 #define FVSIZE  (VSIZE / sizeof(float))
 #define IVSIZE  (VSIZE / sizeof(int))
-#define LLVSIZE (VSIZE / sizeof(int))
+#define LLVSIZE (VSIZE / sizeof(long long int))
 #define VALIGN  (VSIZE)
 
 

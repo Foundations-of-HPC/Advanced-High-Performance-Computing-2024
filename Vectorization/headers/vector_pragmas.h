@@ -25,6 +25,18 @@
 
 
 /* @ ······················································· @
+   :                                                         :
+   : NOTE: this headers files are just a toy-lab to          :
+   :       introduce students to the matter with very simple :
+   :       materials.                                        :
+   :       To go deeper in that, or for production visit:    :
+   :       - vector class:                                   :
+   :         https://github.com/vectorclass/version2/tree/master
+   :       - highway:                                        :
+   :         https://github.com/google/highway               :
+   :                                                         :
+   :                                                         :
+   : - - - - - - - - - - - - - - - - - - - - - - - - - - - - :
    :  Here we collect some macros to express vectorization   :
    :  Pragmas indpendently on the compiler used.             :
    :  This is intended to have only didactial purposes and   :
@@ -129,7 +141,7 @@
 #pragma message "using GCC"
 
 #define IVDEP              _Pragma("GCC ivdep")
-#define LOOP_VECTORIZE     _Pragma("GVV ivdep")
+#define LOOP_VECTORIZE     _Pragma("GCC ivdep")
 #define LOOP_VECTOR_LENGTH(N)
 
 #define LOOP_UNROLL        _Pragma("GCC unroll 4")
