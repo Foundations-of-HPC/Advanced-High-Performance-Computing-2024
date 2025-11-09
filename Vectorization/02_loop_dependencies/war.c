@@ -46,16 +46,31 @@ uint loop_sum ( uint *restrict a, const uint *restrict c, const uint N )
 
 uint loop_sum_reshuffle ( uint *restrict a, const uint *restrict c, const uint N )
 {
+
   uint sum = 0;
-  for ( uint i = 1; i <= 4; i++ )
-    sum += a[i];
+  // Process the bulk with vectorizable loop
+  // We can safely look ahead by 4 only up to N-4
+  uint vec_limit = (N > 4) ? N - 4 : 0;
+
+  {
+    // Initial sum of first 4 elements (or all if N < 4)
+    uint init_limit = (N < 4) ? N : 4;
+    for ( uint i = 1; i < init_limit; i++ )
+      sum += a[i];
+  }
 
  #pragma GCC ivdep
-  for ( uint i = 1; i < N; i++ ) {
+  for ( uint i = 1; i < vec_limit; i++ ) {
     a[i-1] = a[i] + c[i];
-    //if ( i+1 < N)
     sum += a[i+4]; }
-
+  
+  // Handle tail: elements from vec_limit to N-1
+  for ( uint i = vec_limit; i < N; i++ )
+    {
+      if (i > 0)
+	a[i-1] = a[i] + c[i];
+    }
+  
   return sum;
 }                                       
 
