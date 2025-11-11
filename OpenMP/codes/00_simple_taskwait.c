@@ -64,6 +64,7 @@ int main( int argc, char **argv )
       }
 
      #pragma omp taskwait
+      fflush(stdout);
       printf(" «Yuk yuk, it is still me, thread %d "
 	     "inside single region after all tasks ended\n", me);
       
@@ -71,7 +72,7 @@ int main( int argc, char **argv )
 
    #pragma omp taskwait
 
-   #pragma omp barrier
+    //#pragma omp barrier
     
     printf(" :Hi, here is thread %d after the end "
 	   "of the single region, I'm stuck waiting "

@@ -59,7 +59,7 @@
 // see below, around lines 215, 245
 //
 
-#if !defined(TASKS_GRANULARITY )
+#if defined(TASKS_GRANULARITY )
 
 
 // when compiling with this option, a single task will execute TASK_GRANULARITY
