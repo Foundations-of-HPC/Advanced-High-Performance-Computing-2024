@@ -69,6 +69,10 @@ int main( int argc, char **argv )
       
     }
 
+   #pragma omp taskwait
+
+   #pragma omp barrier
+    
     printf(" :Hi, here is thread %d after the end "
 	   "of the single region, I'm stuck waiting "
 	   "all the others\n", omp_get_thread_num() );    
