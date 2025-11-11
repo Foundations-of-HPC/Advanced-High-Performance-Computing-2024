@@ -11,9 +11,6 @@
 #include <string.h>
 #include <time.h>
 
-#include<stdio.h>
-#include<stdlib.h>
-
 // ······················································
 // type definition
 //

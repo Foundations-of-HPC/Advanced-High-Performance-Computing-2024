@@ -312,7 +312,7 @@ uint walk ( llnode_t *start, int mode, void *pointer )
 		} }
 	      break;
 
-	      // verify that all the active nodes have been processes
+	      // verify that all the active nodes have been processed
 	      // and that the results are correct
 	    case WALK_VERIFY: {
 	      // count how many active nodes have been processed
@@ -528,7 +528,7 @@ int main ( int argc, char **argv )
     int const_value = 0;
     int c;
     
-    while ( (c = getopt(argc, argv, "N:c:f:C:s:F:v:h"))  != -1 )
+    while ( (c = getopt(argc, argv, "N:c:f:C:s:F:v:M:h"))  != -1 )
       switch ( c ) {
 
       case 'N':
@@ -575,7 +575,7 @@ int main ( int argc, char **argv )
 	       "\tF :  the fraction of nodes that will be \"active\"\n"
 	       "\tM :  the max value to be used when processing a node\n"
 	       "\tf :  the name of the file that contains the nodes' values\n"
-	       "\tv :  the value to be used to generate a nu,ber of nodes with constant value\n"
+	       "\tv :  the value to be used to generate nodes with constant value\n"
 	       "\tN :  the number of nodes to be generated with constant value\n" );
 	exit( 0 );
 	break;
@@ -589,8 +589,8 @@ int main ( int argc, char **argv )
       printf ( "unknown case %d\n", case_to_run );
       exit(1); }
 
-    if ( ( (const_value != 0) ||
-	   (N > 0) ) &&
+    if ( ((const_value != 0) ||
+	  (N > 0)) &&
 	 (const_value*N == 0) )
       {
 	printf ("if you want to generate nodes with constant values "

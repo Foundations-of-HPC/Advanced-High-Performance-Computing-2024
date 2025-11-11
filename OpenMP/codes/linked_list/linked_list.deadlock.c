@@ -27,7 +27,7 @@ typedef unsigned long long ull;
 int me;
 #pragma omp threadprivate(me)
 
-#define CPU_TIME ({ struct timespec ts; (clock_gettime( CLOCK_REALTIME, &ts ), \
+#define CPU_TIME ({ struct timespec ts; (clock_gettime( CLOCK_TAI, &ts ), \
 					 (ull)ts.tv_sec * 1000000000 +	\
 					 (ull)ts.tv_nsec); })
 
@@ -89,12 +89,12 @@ int clashes;
 
 llnode_t* get_head        ( llnode_t *);
 int       walk            ( llnode_t *);
-int       delete          ( llnode_t * );
+int       delete_all      ( llnode_t * );
 int       find            ( llnode_t *, int, llnode_t **, llnode_t ** );
 int       find_and_insert ( llnode_t *, int );
 
 #if defined(_OPENMP)
-int       find_and_insert_parallel ( llnode_t *, int, int );
+int       find_and_insert_parallel ( llnode_t *, int, int, unsigned int * );
 #endif
 
 //
@@ -152,7 +152,7 @@ int walk ( llnode_t *start )
 
 // ······················································
 
-int delete ( llnode_t *head )
+int delete_all( llnode_t *head )
 /*
  * delete all the nodes
  * destroy every lock
@@ -257,7 +257,7 @@ int find_and_insert( llnode_t *head, int value )
 // ······················································
 
 
-int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
+int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsigned int *clashes )
 {
   if ( head == NULL )
     return -1;
@@ -283,7 +283,7 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
 	while ( omp_test_lock(&(prev->lock)) == 0 ) {
 	 #pragma omp taskyield
 	}
-      prev->owner=me;
+      //prev->owner=me;
       if ( next != NULL )
 	while ( omp_test_lock(&(next->lock)) == 0 ) {
 	 #pragma omp taskyield
@@ -312,7 +312,7 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
       // let's keep track of how many clashes
       // 
      #pragma omp atomic update
-      clashes++;
+      (*clashes)++;
       
       if( (prev != NULL) && (prev-> next != next) )
 	{
@@ -359,7 +359,7 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield )
 		 (prev!=NULL?prev->data:-1),(next->prev!=NULL?(next->prev)->data:-1) );
 
 	  if (prev != NULL)
-	    // free the lock on the old next
+	    // free the lock on the old prev
 	    omp_unset_lock(&(prev->lock));
 
 	  dbgout("[ %llu ]\t\t>> T %d V %d restart from %d to walk back\n",
@@ -436,7 +436,7 @@ int main ( int argc, char **argv )
    #endif
     int seed = ( argc > a ? atoi(*(argv+a++)) : 98765 );
     
-    srand( seed );
+    srand48( seed );
   }
 
 
@@ -455,19 +455,21 @@ int main ( int argc, char **argv )
   int n = 1;
   while ( n < N )
     {
-      int new_value = rand();
+      int new_value = lrand48();
       int ret = find_and_insert( head, new_value );
       if ( ret < 0 )
 	{
 	  printf("I've got a problem inserting node %d\n", n);
-	  delete( head );
+	  // cleanup
+	  delete_all( head );
 	}
       n++;
     }
 
  #else
 
-  #pragma omp parallel
+  unsigned int clashes = 0;
+ #pragma omp parallel
   {
     me = omp_get_thread_num();
     #pragma omp single
@@ -476,11 +478,11 @@ int main ( int argc, char **argv )
       int n = 1;
 
       while ( n < N )
-	{
-	  int new_value = rand();
+	{	  
+	  int new_value = lrand48() % (N/10);  // we want to have hase some clashes
 
 	 #pragma omp task
-	  find_and_insert_parallel( head, new_value, mode );
+	  find_and_insert_parallel( head, new_value, mode, &clashes );
 	  
 	  n++;
 	}
@@ -497,12 +499,13 @@ int main ( int argc, char **argv )
   if ( actual_nodes != N )
     printf("shame on me! %d nodes instaed of %d have been found!",
 	   actual_nodes, N);
-  
-  delete ( head );
+
+  // cleanup
+  delete_all ( head );
 
   char string[23] = {0};
  #if defined(_OPENMP)
-  sprintf( string, " with %d clashes", clashes);  
+  sprintf( string, " with %u clashes", clashes);  
  #endif
   printf("generation took %g seconds (wtime) %s\n", ((double)timing/1e9), string);
   
