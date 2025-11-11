@@ -44,10 +44,10 @@ int me;
 
 
 #if defined(DEBUG)
-#define TIMESTAP (CPU_TIME % TIME_CUT)
+#define TIMESTAMP (CPU_TIME % TIME_CUT)
 #define dbgout(...) printf( __VA_ARGS__ );
 #else
-#define TIMESTAP
+#define TIMESTAMP
 #define dbgout(...) 
 #endif
 
