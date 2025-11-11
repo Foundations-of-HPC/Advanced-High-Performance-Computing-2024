@@ -12,6 +12,19 @@
 #include "../headers/vector_pragmas.h"
 
 
+/*
+ *  ALL conditional compilations options
+ *
+ * ALIGN_MEMORY     memory is allocated aligned, __assume__ hints are given
+ * UNALIGN_MEMORY   memory explicitly misaligned
+ * WARMUP_MEMORY    warm-up before calling the kernel
+ *
+ * CASE 0           "normal" scalar loop
+ * CASE 1           scalar loop unrolled
+ * CASE 2           vector loop
+ */
+
+
 #define ALIGN 32
 
 #if !defined(CASE)
@@ -45,6 +58,7 @@ void __attribute__ ((noinline)) warmup( double *restrict A, double *restrict B, 
   LOOP_UNROLL_N(4)
   for ( int i = 0; i < N; i++ )
     A[i] = 1.0, B[i] = 1.0, C[i] = 1.0;
+  
   /* for ( int i = 0; i < N; i++ ) */
   /*   B[i] = 1.0; */
   /* for ( int i = 0; i < N; i++ ) */
@@ -56,7 +70,7 @@ void __attribute__ ((noinline)) warmup( double *restrict A, double *restrict B, 
 
 
 
-double __attribute__ ((noinline)) process ( double *restrict A, double *restrict B, double *restrict C, int N )
+double __attribute__ ((noinline)) process ( const double *restrict A, const double *restrict B, const double *restrict C, int N )
 {
  #if defined(ALIGN_MEMORY)
   A = __builtin_assume_aligned(A, ALIGN);
@@ -86,7 +100,6 @@ double __attribute__ ((noinline)) process ( double *restrict A, double *restrict
   */
   IVDEP
   LOOP_VECTORIZE
-    //LOOP_UNROLL_N(4)    
   for ( ; i < N_4; i+=4 )
     {
       asum[0] += A[i  ]*B[i  ] + C[i  ];
