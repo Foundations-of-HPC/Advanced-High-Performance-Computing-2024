@@ -19,7 +19,7 @@
 //
 
 typedef unsigned long long ull;
-#define TIME_CUT 1000000009
+#define TIME_CUT 100000000
 
 
 #if defined(_OPENMP)
