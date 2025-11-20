@@ -479,7 +479,7 @@ int main ( int argc, char **argv )
 
       while ( n < N )
 	{	  
-	  int new_value = lrand48() % (N*N);  // we want to have hase some clashes
+	  int new_value = lrand48() % (N/10);  // we want to have hase some clashes
 
 	 #pragma omp task
 	  find_and_insert_parallel( head, new_value, mode, &clashes );

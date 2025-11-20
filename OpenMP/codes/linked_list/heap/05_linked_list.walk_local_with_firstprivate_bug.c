@@ -19,7 +19,7 @@
 //
 
 typedef unsigned long long ull;
-#define TIME_CUT 100000000
+#define TIME_CUT 1000000009
 
 
 #if defined(_OPENMP)
@@ -44,11 +44,19 @@ int me;
 
 
 #if defined(DEBUG)
+
+#define DEBUG_SET 1
 #define TIMESTAMP (CPU_TIME % TIME_CUT)
 #define dbgout(...) printf( __VA_ARGS__ );
+#define SET_OWNER( ptr, me ) ((ptr)->owner = (me))
+#define UNSET_OWNER( ptr ) ((ptr)->owner = -1)
 #else
+
+#define DEBUG_SET 0
 #define TIMESTAMP
 #define dbgout(...) 
+#define SET_OWNER( ptr, own )
+#define UNSET_OWNER( ptr )
 #endif
 
 
@@ -66,7 +74,9 @@ typedef struct llnode
   int data;
  #if defined(_OPENMP)
   omp_lock_t lock;
+ #if defined(DEBUG)
   int        owner;
+ #endif
  #endif
   
   struct llnode *next;
@@ -81,13 +91,13 @@ typedef struct llnode
 //
 
 llnode_t* get_head        ( llnode_t *);
-int       walk            ( llnode_t *);
+int       walk            ( llnode_t *, int );
 int       delete_all      ( llnode_t * );
 int       find            ( llnode_t *, int, llnode_t **, llnode_t ** );
 int       find_and_insert ( llnode_t *, int );
 
 #if defined(_OPENMP)
-int       find_and_insert_parallel ( llnode_t *, int, int, unsigned int * );
+int       find_and_insert_parallel ( llnode_t *, int, int, unsigned int *, llnode_t ** );
 #endif
 
 //
@@ -111,33 +121,39 @@ llnode_t *get_head ( llnode_t *start )
 
 // ······················································
 
-int walk ( llnode_t *start )
+int walk ( llnode_t *start, int mode )
 /*
  * walk the list starting from the node start
- * as first, the list is walked back until the list head
  * if mode == 1, the list is then walked ahed printing
  * the first 100 nodes.
  */
 {
-  int n = 0;
-  if ( start != NULL )
+  if ( start == NULL )
+    return -1;
+
+  int n = 1;
+  int prev_value = start->data;
+  if(mode) printf("%9d [-]", start->data );
+  
+  start = start->next;
+  while( start != NULL)
     {
-      n = 1;
-      int prev_value = start->data;
-      printf("%9d [-]", start->data );
-      start = start->next;
-      while( start != NULL)
+      
+      if( mode )
 	{
-	  if (++n < 100 )
+	  if (n < 100 )
 	    printf( "%9d %s ",
-		   start->data,
-		   (start->data < prev_value? "[!]":"[ok]") );
+		    start->data,
+		    (start->data < prev_value? "[!]":"[ok]") );
 	  else if ( n == 100)
 	    printf( "..." );
 	  prev_value = start->data;
-	  start = start->next;
 	}
+      
+      n++;
+      start = start->next;
     }
+    
   printf("\n");
   return n;
 }
@@ -217,6 +233,21 @@ int find ( llnode_t *head, int value, llnode_t **prev, llnode_t **next )
   return nsteps;
 }
 
+static inline int my_test_lock( llnode_t *node, int me )
+{
+  int got = omp_test_lock(&(node->lock));
+  if ( got )
+    SET_OWNER(node, me);
+
+  return got;
+}
+
+
+static inline void my_unset_lock( llnode_t *node )
+{
+  UNSET_OWNER(node);
+  omp_unset_lock(&(node->lock));
+}
 
 int find_and_insert( llnode_t *head, int value )
 {
@@ -255,26 +286,25 @@ int find_and_insert( llnode_t *head, int value )
 // ······················································
 
 
-int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsigned int *clashes )
+int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsigned int *clashes, llnode_t **new_node )
 {
   
   if ( head == NULL )
-    return -1;
+    return 0;
 
-  dbgout("[ %llu ] > T %d process value %d\n", TIMESTAMP, me, value );
-
-  int done = 0;
+  llnode_t *start = head;
+  int done = 0;  
 
   while ( !done )
     {
 
       llnode_t *prev = NULL, *next = NULL;
       // find the first guess for the insertion point
-      //
-      find ( head, value, &prev, &next );
-  
-      dbgout("[ %llu ] T %d V %d found p: %d and n: %d\n", TIMESTAMP, me, value,
-	     prev!=NULL?prev->data:-1, next!=NULL?next->data:-1);
+      // NOTE: this look-up runs while other threads may be
+      //       inserting nodes; as such, if you run with
+      //       a thread-analyzer, it may result in
+      //       "possible data race" warnings
+      find ( start, value, &prev, &next );
   
       // to our best knowledge, next is the first node with data > value
       // and prev is the last node with data < value
@@ -294,7 +324,7 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 		 #pragma omp taskyield
 		} } 
 
-	      prev->owner = me;
+	      SET_OWNER(prev, me);
 	      locks_acquired = 1;
 	    }
 
@@ -304,14 +334,13 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 	    {
 	      // we acquire the lock on the next
 	      //
-	      locks_acquired = omp_test_lock(&(next->lock));
+	      locks_acquired = my_test_lock(next, me);
 	      if( !locks_acquired && (prev!=NULL) )
 		{
 		  // we did not acquire it, but we have
 		  // the lock on prev;
 		  // let's release it and retry
-		  prev->owner = -1;
-		  omp_unset_lock(&(prev->lock));
+		  my_unset_lock(prev);
 		  if ( use_taskyield ) {
 		    // if we wnat to use the taskyield feature,
 		    // that is a good moment ?
@@ -319,18 +348,13 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 		  }
 		}
 	      else
-		next->owner = me;
+		SET_OWNER(next, me);
 	    }      
 	}
   
 
-      dbgout("[ %llu ] T %d V %d locked: (p: %d %p p>n: %d) (n: %d %p n<p: %d)\n",
-	     TIMESTAMP, me, value,
-	     (prev!=NULL?prev->data:-1), (prev!=NULL?prev:0),  ((prev!=NULL)&&(prev->next!=NULL)?(prev->next)->data:-1),
-	     (next!=NULL?next->data:-1), (next!=NULL?next:0),  ((next!=NULL)&&(next->prev!=NULL)?(next->prev)->data:-1) );
-
      #define MAX_ATTEMPTS 100
-      int attempts = 0;
+      int too_many_attempts = 0;
       // meanwhile, did somebody already insert a node between prev and next?
       if( ( (prev != NULL) && (prev-> next != next) ) ||
 	  ( (next != NULL) && (next-> prev != prev) ) )
@@ -341,52 +365,44 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 	 #pragma omp atomic update
 	  (*clashes)++;
       
-	  if( (prev != NULL) && (prev-> next != next) )
+	  if( prev != NULL )  // then, (prev-> next != next)
 	    {
 	      // the next pointer has changed
 	      // prev is not null, so that is our still valid point
 	      // we'll walk ahead from there
 	      //
-	      dbgout("[ %llu ]\t>> T %d V %d next has changed: from %d to %d\n",
-		     TIMESTAMP, me, value,
-		     (next!=NULL?next->data:-1),(prev->next!=NULL?(prev->next)->data:-1) );
 
 	      if (next != NULL) {
 		// free the lock on the old next
-		next->owner = -1;
-		omp_unset_lock(&(next->lock));
-		dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p\n",
-		       TIMESTAMP, me, value, next->data, next); }
-
-	      dbgout("[ %llu ]\t\t>>> T %d V %d restart from %d to walk ahead\n",
-		     TIMESTAMP, me, value, prev->data);
+		my_unset_lock(next); }
 	  
-	      // search again fgor a right node, while always keeping prev locked
+	      // search again for a right node, while always keeping prev locked
 	      next = prev->next;
-	      while( (next != 0x0) && (attempts < 100) )
+	      while( (next != 0x0 ) && (!too_many_attempts) )
 		{
-		  dbgout("[ %llu ]\t\t\t>>> T %d V %d stepping into %d %p while walking ahead {own: %d}\n",
-			 TIMESTAMP, me, value, next->data, next, next->owner );
 
-		  int got_next_lock = omp_test_lock(&(next->lock));
-		  if ( got_next_lock )
+		  int attempts      = 0;
+		  while (++attempts < MAX_ATTEMPTS)
 		    {
-		      next->owner = me;
-		      dbgout("[ %llu ]\t>> T %d V %d got lock on %d %p while walking ahead\n",
-			     TIMESTAMP, me, value, next->data, next);
+		      int got_next_lock = my_test_lock(next, me);
+		      if( (!got_next_lock) && (use_taskyield) ) {
+		       #pragma omp taskyield
+		      }
+		    }
 
+		  too_many_attempts = (attempts == MAX_ATTEMPTS);
+		  
+		  if ( !too_many_attempts )
+		    {
 		      if( next->data >= value )
 			// we have found our new next
 			// exit this while
 			break;
-
+		      
 		      // the current next node is actually
 		      // a left node; release the lock on prev
-		      prev->owner = -1;
-		      omp_unset_lock(&(prev->lock));
-		      dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p while walking ahead\n",
-			     TIMESTAMP, me, value, prev->data, prev);
-
+		      my_unset_lock(prev);
+		      
 		      // and continue searching for a right node
 		      // NOTE: we keep the lock on the current "next",
 		      // that in the following line becomes the "prev"
@@ -394,61 +410,47 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 		      // walk ahead
 		      next = next->next;
 		    }
-		  attempts++;
 		}
-	      if ( (attempts == MAX_ATTEMPTS) &&
-		   (prev!=NULL) ) {
-		dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p after MAX_ATTEMPTS while walking back\n",
-		       TIMESTAMP, me, value, prev->data, prev);
-		omp_unset_lock(&(prev->lock)); }	      
 	    }
       
-	  else if ( next->prev != prev )
+	  else if ( next!= NULL ) // and then also (next->prev != prev)
 	    // note that next can not be NULL
 	    {
 	      // the prev pointer has changed
 	      // next is not null, so that is our still valid point
 	      // we walk back from there
 	      //
-	      dbgout("[ %llu ]\t>> T %d V %d prev has changed: from %d to %d\n",
-		     TIMESTAMP, me, value,
-		     (prev!=NULL?prev->data:-1),(next->prev!=NULL?(next->prev)->data:-1) );
-
 	      if (prev != NULL) {
 		// free the lock on the old prev
-		prev->owner = -1;
-		dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p while walking back\n",
-		       TIMESTAMP, me, value, prev->data, prev);
-		omp_unset_lock(&(prev->lock)); }
+		my_unset_lock(prev); }
 
-	      dbgout("[ %llu ]\t\t>> T %d V %d restart from %d %p to walk back\n",
-		     TIMESTAMP, me, value, next->data, next);
-      	
 	      // search again, while always keeping prev locked
 	      prev = next->prev;
-	      while( (prev != 0x0) && (attempts < 100) )
+	      while( (prev != 0x0) && (!too_many_attempts) ) 
 		{
-		  dbgout("[ %llu ]\t\t\t>>> T %d V %d stepping into %d %p while walking back {own: %d}\n",
-			 TIMESTAMP, me, value, prev->data, prev, prev->owner);
-		  int got_prev_lock = omp_test_lock(&(prev->lock));
-		  if ( got_prev_lock )
+		  
+		  int attempts = 0;
+		  while (++attempts < MAX_ATTEMPTS)
 		    {
-		      prev->owner = me;
-		      dbgout("[ %llu ]\t>> T %d V %d got lock on %d %p while walking back\n",
-			     TIMESTAMP, me, value, prev->data, prev);
-		 
+		      int got_prev_lock = my_test_lock(prev, me);
+		      if( (!got_prev_lock) && (use_taskyield) ) {
+		       #pragma omp taskyield
+		      }
+		    }
+
+		  too_many_attempts = (attempts == MAX_ATTEMPTS);
+		  
+		  if ( !too_many_attempts )
+		    {
 		      if( prev->data <= value )
 			// we have found our new prev
 			// exit the while
 			break;
-
+		      
 		      // ops, the current prev is actually
 		      // a left node; release the lock on next
-		      next->owner = -1;
-		      omp_unset_lock(&(next->lock));
-		      dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p while walking back\n",
-			     TIMESTAMP, me, value, next->data, next);
-
+		      my_unset_lock(next);
+		      
 		      // continue searching for a left node.
 		      // NOTE: we keep the lock on the current "prev",
 		      // that in the following line becomes the "next"
@@ -456,23 +458,39 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 		      // walk backward
 		      prev = prev->prev;
 		    }
-		  attempts++;
+		  
 		}
-	      if ( (attempts == MAX_ATTEMPTS) &&
-		   (next!=NULL) ) {
-		dbgout("[ %llu ]\t>> T %d V %d releases lock on %d %p after MAX_ATTEMPTS while walking back\n",
-		       TIMESTAMP, me, value, next->data, next);
-		omp_unset_lock(&(next->lock)); }
-		
 	    }
-	  else if ( next == NULL )
+	  else
 	    {
-	      printf("Some serious error occurred, a prev = next = NULL situation arose!\n");	  
+	      printf("Some serious error occurred: "
+		     "a prev = next = NULL situation "
+		     "has been found!\n");	  
 	      return -3;
 	    }
-	}
 
-      if ( attempts < MAX_ATTEMPTS )
+	}
+      
+      if ( too_many_attempts )
+	{
+	  // we'll release everything and re-start from
+	  // finding our insertion point
+	  // let's set the start pointer for the find()
+	  // routine to a close point
+	  //
+	  if ( prev!=NULL )
+	    { start = prev; my_unset_lock(prev); }
+	  if ( next!=NULL )
+	    { start = next; my_unset_lock(next); }
+	  
+	  // if something is left to be done,
+	  // just do it
+	  if (use_taskyield ) {
+	   #pragma omp taskyield
+	  }
+	}
+      
+      else
 	{
       
 	  // at this point, we have found our new left and right pointers,
@@ -481,23 +499,20 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
 	  // insertion code
 	  //
 
-	  dbgout("[ %llu ]\tthread %d processing %d inserts value between %d %p and %d %p\n",
-		 TIMESTAMP, me, value,
-		 (prev!=NULL?prev->data:-1), (prev!=NULL?prev:0),
-		 (next!=NULL?next->data:-1), (next!=NULL?next:0) );
-  
 	  // allocate a new node
 	  // HINT: transform everything in an array of nodes
 	  //
 	  llnode_t *new = (llnode_t*)malloc( sizeof(llnode_t) );
+	  *new_node = new;
 	  if ( new == NULL )
 	    return -2;
   
 	  // initialize the new node
 	  //omp_init_lock_with_hint( &(new->lock), omp_lock_hint_contended );
+	  // if the compiler does not support lock_with_hint,
+	  // use the unhinted initialization
 	  omp_init_lock( &(new->lock) );
-	  omp_set_lock( &(new->lock) );   // well not so usefule, though
-	  new->owner= me;
+	  SET_OWNER(new, me);
 	  new->data = value;
 	  new->prev = prev;
 	  new->next = next;
@@ -508,29 +523,17 @@ int find_and_insert_parallel( llnode_t *head, int value, int use_taskyield, unsi
   
 	  // release locks
 	  //
-	  if ( prev != NULL ) {
-	    prev->owner = -1;
-	    omp_unset_lock(&(prev->lock));
-	    dbgout("[ %llu ]\tthread %d processing %d releases lock on %d %p\n",
-		   TIMESTAMP, me, value, prev->data, prev);}
+	  if ( prev != NULL )
+	    my_unset_lock(prev);
 					  
-	  if( next != NULL ) {
-	    next->owner = -1;
-	    omp_unset_lock(&(next->lock));
-	    dbgout("[ %llu ]\tthread %d processing %d releases lock on %d %p\n",
-		   TIMESTAMP, me, value, next->data, next);}
-
-	  new->owner = -1;
-	  omp_unset_lock(&(new->lock));
-	  dbgout("[ %llu ]\tthread %d processing %d releases lock on %d %p\n",
-		 TIMESTAMP, me, value, new->data, new);
-
+	  if( next != NULL )
+	    my_unset_lock(next);
+	  
 	  done = 1;
 	}
       #undef MAX_ATTEMPTS
     }  // closes main while ( !done )
   
-  dbgout("T %d V %d has done\n", me, value);
   return 0;
 }
 
@@ -549,8 +552,10 @@ int main ( int argc, char **argv )
    #if defined(_OPENMP)
     mode = ( argc > a ? atoi(*(argv+a++)) : DONT_USE_TASKYIELD );
    #endif
-    int seed = ( argc > a ? atoi(*(argv+a++)) : 98765 );
-    
+    long int seed = ( argc > a ? atoi(*(argv+a++)) : 98765 );
+
+    if ( seed == 0 )
+      seed = time(NULL);
     srand48( seed );
   }
 
@@ -561,17 +566,20 @@ int main ( int argc, char **argv )
   head->next = NULL;
  #if defined(_OPENMP)
   //omp_init_lock_with_hint( &(head->lock), omp_lock_hint_contended );
+  // if the compiler does not support lock_with_hint,
+  // use the unhinted initialization
   omp_init_lock( &(head->lock) );
  #endif
   
-  ull timing = CPU_TIME;
+  ull timing   = CPU_TIME;
   int progress = (N/10);
+  int norm     = N*N;
   
  #if !defined(_OPENMP)
   int n = 1;
   while ( n < N )
     {
-      int new_value = lrand48();
+      int new_value = lrand48() % norm;
       int ret = find_and_insert( head, new_value );
       if ( ret < 0 )
 	{
@@ -590,36 +598,80 @@ int main ( int argc, char **argv )
  #pragma omp parallel
   {
     me = omp_get_thread_num();
+
     #pragma omp single
     {
       printf("running with %d threads, thread %d generates tasks\n",
 	     omp_get_num_threads(), me);
+
+      llnode_t *start = head;
+      
+      int nsteps   = 10;
+      int step     = (N/10);
+      int nextstep = 1;
+
+      int N_1      = N-1;
+      int n        = 0;
+
+      while ( n < N_1 )
+	{
+	 #define BATCH_SIZE 100
+	  int this_batch_size = ( BATCH_SIZE > N-n-1 ? N-n-1 : BATCH_SIZE );
+
+	 #pragma omp task
+	  {
+	    for ( int batch = 0; batch < this_batch_size; batch++ )
+	      {
+		int new_value = lrand48() % norm;
+		find_and_insert_parallel( start, new_value, mode, &clashes, &start );
+	      }
+	  }
+	  n += this_batch_size;
+	  if ( n >= (step*nextstep)  ) {
+	    printf("%.1f%% of nodes done\n", (double)n/N*100);
+	    nextstep++; }
+	}
+    }
+
+    /*
+   #pragma omp single
+    {
+      printf("running with %d threads, thread %d generates tasks\n",
+	     omp_get_num_threads(), me);
+
+      llnode_t *node_start = head;
       int n = 1;
 
       while ( n < N )
 	{	  
-	  int new_value = lrand48() % (N/10);  // we want to have some clashes
+	  int new_value = lrand48() % norm;
 
 	 #pragma omp task
-	  find_and_insert_parallel( head, new_value, mode, &clashes );
+	  find_and_insert_parallel( node_start, new_value, mode, &clashes, &node_start );
 	  
 	  n++;
 	  if ( n % progress == 0 )
-	    printf("%.1f%% of nodes done\n", (double)n/N*100);
+	    printf("%.1f%% of nodes (%d of %d) done\n",
+		   (double)n/N*100, n, N);
 	}
     }
+    */
   }
 
  #endif
 
   timing = CPU_TIME - timing;
 
+  printf("verifying..\n"); fflush(stdout);
+  
   head = get_head( head );
 
-  int actual_nodes = walk( head);
+  int actual_nodes = walk( head, DEBUG_SET );
   if ( actual_nodes != N )
     printf("shame on me! %d nodes instaed of %d have been found!",
 	   actual_nodes, N);
+  else
+    printf("ok\n");
 
   // cleanup
   delete_all ( head );
