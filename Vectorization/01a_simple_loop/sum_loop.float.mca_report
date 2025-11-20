@@ -1,0 +1,897 @@
+Iterations:        100
+Instructions:      25500
+Total Cycles:      8288
+Total uOps:        29700
+
+Dispatch Width:    6
+uOps Per Cycle:    3.58
+IPC:               3.08
+Block RThroughput: 49.5
+
+
+Instruction Info:
+[1]: #uOps
+[2]: Latency
+[3]: RThroughput
+[4]: MayLoad
+[5]: MayStore
+[6]: HasSideEffects (U)
+
+[1]    [2]    [3]    [4]    [5]    [6]    Instructions:
+ 1      100   0.25                  U     endbr64
+ 1      2     0.20                        test	esi, esi
+ 1      0     0.20                        mov	ecx, esi
+ 1      1     0.50                        je	.L7
+ 1      1     1.00                        lea	eax, [rsi - 1]
+ 1      1     0.20                        cmp	eax, 2
+ 1      1     0.50                        jbe	.L8
+ 1      0     0.20                        mov	edx, esi
+ 0      1     0.00                        mov	rax, rdi
+ 1      1     0.33                        vxorpd	xmm0, xmm0, xmm0
+ 1      1     0.50                        shr	edx, 2
+ 1      1     0.50                        shl	rdx, 5
+ 1      1     0.20                        add	rdx, rdi
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rax]
+ 0      1     0.00                        add	rax, 32
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rax - 24]
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rax - 16]
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rax - 8]
+ 1      1     0.20                        cmp	rax, rdx
+ 1      1     0.50                        jne	.L4
+ 1      2     0.20                        test	cl, 3
+ 1      1     0.50                        je	.L1
+ 1      0     0.20                        mov	eax, ecx
+ 1      2     0.20                        and	eax, -4
+ 1      0     0.20                        mov	edx, eax
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+ 1      1     1.00                        lea	edx, [rax + 1]
+ 1      1     0.20                        cmp	edx, ecx
+ 1      1     0.50                        jae	.L1
+ 1      1     0.20                        add	eax, 2
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+ 1      1     0.20                        cmp	eax, ecx
+ 1      1     0.50                        jae	.L1
+ 2      10    0.50    *                   vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rax]
+ 2      7     0.50                  U     ret
+ 1      1     0.33                        vxorpd	xmm0, xmm0, xmm0
+ 2      7     0.50                  U     ret
+ 1      2     0.20                        xor	eax, eax
+ 1      1     0.33                        vxorpd	xmm0, xmm0, xmm0
+ 0      0     0.00                        jmp	.L3
+ 1      100   0.25                  U     endbr64
+ 1      1     1.00                        lea	r10, [rsp + 8]
+ 1      2     0.20                        and	rsp, -32
+ 3      1     0.50    *      *            push	qword ptr [r10 - 8]
+ 2      1     0.50           *            push	rbp
+ 0      1     0.00                        mov	rbp, rsp
+ 2      1     0.50           *            push	r15
+ 2      1     0.50           *            push	r14
+ 2      1     0.50           *            push	r13
+ 2      1     0.50           *            push	r12
+ 2      1     0.50           *            push	r10
+ 2      1     0.50           *            push	rbx
+ 0      1     0.00                        sub	rsp, 64
+ 1      5     0.33    *                   mov	rax, qword ptr fs:[40]
+ 2      12    0.50           *            mov	qword ptr [rbp - 56], rax
+ 1      2     0.20                        xor	eax, eax
+ 1      1     0.20                        cmp	edi, 1
+ 1      1     0.50                        jg	.L15
+ 1      1     0.20                        mov	edi, 8000000
+ 1      1     0.20                        mov	r15d, 999999
+ 1      1     0.20                        mov	r12d, 1000000
+ 2      3     0.50                        call	malloc@PLT
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 0      1     0.00                        mov	rbx, rax
+ 1      0     0.20                        mov	edx, r12d
+ 1      1     0.20                        mov	ecx, 8
+ 1      1     0.33                        vxorpd	xmm5, xmm5, xmm5
+ 0      1     0.00                        mov	rax, rbx
+ 1      1     0.50                        shr	edx, 3
+ 1      3     1.00                        vmovd	xmm7, ecx
+ 1      8     0.33    *                   vmovdqa	ymm3, ymmword ptr [rip + .LC1]
+ 1      8     0.33    *                   vbroadcastsd	ymm6, qword ptr [rip + .LC4]
+ 1      1     0.50                        shl	rdx, 6
+ 1      3     1.00                        vpbroadcastd	ymm7, xmm7
+ 1      1     0.20                        add	rdx, rbx
+ 0      1     0.00                        vmovdqa	ymm0, ymm3
+ 0      1     0.00                        add	rax, 64
+ 1      1     0.33                        vpaddd	ymm3, ymm3, ymm7
+ 2      7     1.00                        vcvtdq2pd	ymm1, xmm0
+ 1      4     0.50                        vcmpltpd	ymm2, ymm1, ymm5
+ 1      3     1.00                        vextracti128	xmm0, ymm0, 1
+ 2      7     1.00                        vcvtdq2pd	ymm0, xmm0
+ 1      1     0.33                        vandpd	ymm2, ymm2, ymm6
+ 1      3     0.50                        vaddpd	ymm1, ymm1, ymm2
+ 2      12    0.50           *            vmovupd	ymmword ptr [rax - 64], ymm1
+ 1      4     0.50                        vcmpltpd	ymm1, ymm0, ymm5
+ 1      1     0.33                        vandpd	ymm1, ymm1, ymm6
+ 1      3     0.50                        vaddpd	ymm0, ymm0, ymm1
+ 2      12    0.50           *            vmovupd	ymmword ptr [rax - 32], ymm0
+ 1      1     0.20                        cmp	rdx, rax
+ 1      1     0.50                        jne	.L19
+ 1      0     0.20                        mov	r14d, r12d
+ 1      2     0.20                        and	r14d, -8
+ 1      2     0.20                        test	r12b, 7
+ 1      1     0.50                        je	.L48
+ 0      0     0.00                  U     vzeroupper
+ 1      0     0.20                        mov	eax, r12d
+ 1      1     0.20                        sub	eax, r14d
+ 1      1     1.00                        lea	edx, [rax - 1]
+ 1      1     0.20                        cmp	edx, 2
+ 1      1     0.50                        jbe	.L21
+ 1      3     1.00                        vmovd	xmm7, r14d
+ 1      1     0.33                        vxorpd	xmm1, xmm1, xmm1
+ 1      7     0.33    *                   vmovddup	xmm5, qword ptr [rip + .LC4]
+ 1      0     0.20                        mov	edx, r14d
+ 1      1     1.00                        vpbroadcastd	xmm0, xmm7
+ 2      8     0.33    *                   vpaddd	xmm0, xmm0, xmmword ptr [rip + .LC5]
+ 1      1     1.00                        lea	rdx, [rbx + 8*rdx]
+ 2      5     1.00                        vcvtdq2pd	xmm2, xmm0
+ 1      1     0.50                        vpshufd	xmm0, xmm0, 238
+ 1      4     0.50                        vcmpltpd	xmm3, xmm2, xmm1
+ 2      5     1.00                        vcvtdq2pd	xmm0, xmm0
+ 1      4     0.50                        vcmpltpd	xmm1, xmm0, xmm1
+ 1      1     0.33                        vandpd	xmm3, xmm3, xmm5
+ 1      1     0.33                        vandpd	xmm1, xmm1, xmm5
+ 1      3     0.50                        vaddpd	xmm2, xmm2, xmm3
+ 1      3     0.50                        vaddpd	xmm0, xmm0, xmm1
+ 2      12    0.50           *            vmovupd	xmmword ptr [rdx], xmm2
+ 2      12    0.50           *            vmovupd	xmmword ptr [rdx + 16], xmm0
+ 1      0     0.20                        mov	edx, eax
+ 1      2     0.20                        and	edx, -4
+ 1      1     0.20                        add	r14d, edx
+ 1      2     0.20                        test	al, 3
+ 1      1     0.50                        je	.L22
+ 1      0     0.20                        mov	eax, r14d
+ 2      7     1.00                        vcvtsi2sd	xmm0, xmm4, rax
+ 2      12    0.50           *            vmovsd	qword ptr [rbx + 8*rax], xmm0
+ 1      1     1.00                        lea	eax, [r14 + 1]
+ 1      1     0.20                        cmp	eax, r12d
+ 1      1     0.50                        jae	.L22
+ 2      7     1.00                        vcvtsi2sd	xmm0, xmm4, rax
+ 1      1     0.20                        add	r14d, 2
+ 1      1     0.20                        cmp	r14d, r12d
+ 2      12    0.50           *            vmovsd	qword ptr [rbx + 8*rax], xmm0
+ 1      1     0.50                        jae	.L22
+ 2      7     1.00                        vcvtsi2sd	xmm0, xmm4, r14
+ 2      12    0.50           *            vmovsd	qword ptr [rbx + 8*r14], xmm0
+ 1      1     1.00                        lea	r13, [rbp - 80]
+ 1      1     0.20                        mov	edi, 2
+ 0      1     0.00                        mov	rsi, r13
+ 2      3     0.50                        call	clock_gettime@PLT
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 1      1     0.20                        cmp	r15d, 2
+ 1      7     0.33    *                   vmovsd	xmm2, qword ptr [rip + .LC7]
+ 2      11    0.50    *                   vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+ 2      11    0.50    *                   vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+ 1      4     0.50                        vfmadd132sd	xmm1, xmm0, xmm2
+ 2      12    0.50           *            vmovsd	qword ptr [rbp - 104], xmm1
+ 1      1     0.50                        jbe	.L36
+ 1      0     0.20                        mov	edx, r12d
+ 0      1     0.00                        mov	rax, rbx
+ 1      1     0.33                        vxorpd	xmm1, xmm1, xmm1
+ 1      1     0.50                        shr	edx, 2
+ 1      1     0.50                        shl	rdx, 5
+ 1      1     0.20                        add	rdx, rbx
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rax]
+ 0      1     0.00                        add	rax, 32
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rax - 24]
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rax - 16]
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rax - 8]
+ 1      1     0.20                        cmp	rdx, rax
+ 1      1     0.50                        jne	.L30
+ 1      2     0.20                        test	r12b, 3
+ 1      1     0.50                        je	.L32
+ 1      0     0.20                        mov	eax, r12d
+ 1      2     0.20                        and	eax, -4
+ 1      0     0.20                        mov	edx, eax
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+ 1      1     1.00                        lea	edx, [rax + 1]
+ 1      1     0.20                        cmp	edx, r12d
+ 1      1     0.50                        jae	.L32
+ 1      1     0.20                        add	eax, 2
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+ 1      1     0.20                        cmp	eax, r12d
+ 1      1     0.50                        jae	.L32
+ 2      10    0.50    *                   vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rax]
+ 0      1     0.00                        mov	rsi, r13
+ 1      1     0.20                        mov	edi, 2
+ 2      12    0.50           *            vmovsd	qword ptr [rbp - 96], xmm2
+ 2      12    0.50           *            vmovsd	qword ptr [rbp - 88], xmm1
+ 2      3     0.50                        call	clock_gettime@PLT
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 1      7     0.33    *                   vmovsd	xmm2, qword ptr [rbp - 96]
+ 1      7     0.33    *                   vmovsd	xmm1, qword ptr [rbp - 88]
+ 2      11    0.50    *                   vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 72]
+ 1      1     0.20                        mov	edi, 2
+ 1      1     0.20                        mov	eax, 2
+ 2      11    0.50    *                   vcvtsi2sd	xmm4, xmm4, qword ptr [rbp - 80]
+ 1      1     1.00                        lea	rsi, [rip + .LC8]
+ 1      4     0.50                        vfmadd132sd	xmm0, xmm4, xmm2
+ 2      10    0.50    *                   vsubsd	xmm0, xmm0, qword ptr [rbp - 104]
+ 2      3     0.50                        call	__printf_chk@PLT
+ 0      1     0.00                        mov	rdi, rbx
+ 2      3     0.50                        call	free@PLT
+ 1      5     0.33    *                   mov	rax, qword ptr [rbp - 56]
+ 2      6     0.33    *                   sub	rax, qword ptr fs:[40]
+ 1      1     0.50                        jne	.L49
+ 0      1     0.00                        add	rsp, 64
+ 1      2     0.20                        xor	eax, eax
+ 1      5     0.33    *                   pop	rbx
+ 1      5     0.33    *                   pop	r10
+ 1      5     0.33    *                   pop	r12
+ 1      5     0.33    *                   pop	r13
+ 1      5     0.33    *                   pop	r14
+ 1      5     0.33    *                   pop	r15
+ 1      5     0.33    *                   pop	rbp
+ 1      1     1.00                        lea	rsp, [r10 - 8]
+ 2      7     0.50                  U     ret
+ 1      5     0.33    *                   mov	rdi, qword ptr [rsi + 8]
+ 1      1     0.20                        mov	edx, 10
+ 1      2     0.20                        xor	esi, esi
+ 2      3     0.50                        call	strtol@PLT
+ 1      0     0.20                        mov	edi, eax
+ 0      1     0.00                        mov	r15, rax
+ 1      0     0.20                        mov	r12d, eax
+ 1      1     0.50                        shl	rdi, 3
+ 2      3     0.50                        call	malloc@PLT
+ 1      2     0.20                        test	r15d, r15d
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 0      1     0.00                        mov	rbx, rax
+ 1      1     0.50                        je	.L17
+ 1      1     0.20                        sub	r15d, 1
+ 1      1     0.20                        cmp	r15d, 6
+ 1      1     0.50                        ja	.L16
+ 1      2     0.20                        xor	r14d, r14d
+ 0      0     0.00                        jmp	.L18
+ 1      1     1.00                        lea	r13, [rbp - 80]
+ 1      1     0.20                        mov	edi, 2
+ 0      1     0.00                        mov	rsi, r13
+ 2      3     0.50                        call	clock_gettime@PLT
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 1      7     0.33    *                   vmovsd	xmm2, qword ptr [rip + .LC7]
+ 2      11    0.50    *                   vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+ 2      11    0.50    *                   vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+ 1      4     0.50                        vfmadd132sd	xmm1, xmm0, xmm2
+ 2      12    0.50           *            vmovsd	qword ptr [rbp - 104], xmm1
+ 1      1     0.33                        vxorpd	xmm1, xmm1, xmm1
+ 0      0     0.00                        jmp	.L32
+ 1      1     1.00                        lea	r13, [rbp - 80]
+ 1      1     0.20                        mov	edi, 2
+ 0      0     0.00                  U     vzeroupper
+ 1      0     0.20                        mov	r12d, r14d
+ 0      1     0.00                        mov	rsi, r13
+ 2      3     0.50                        call	clock_gettime@PLT
+ 1      1     0.33                        vxorps	xmm4, xmm4, xmm4
+ 1      7     0.33    *                   vmovsd	xmm2, qword ptr [rip + .LC7]
+ 2      11    0.50    *                   vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+ 2      11    0.50    *                   vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+ 1      4     0.50                        vfmadd132sd	xmm1, xmm0, xmm2
+ 2      12    0.50           *            vmovsd	qword ptr [rbp - 104], xmm1
+ 0      0     0.00                        jmp	.L33
+ 1      1     0.33                        vxorpd	xmm1, xmm1, xmm1
+ 1      2     0.20                        xor	eax, eax
+ 0      0     0.00                        jmp	.L29
+ 2      3     0.50                        call	__stack_chk_fail@PLT
+
+
+Dynamic Dispatch Stall Cycles:
+RAT     - Register unavailable:                      0
+RCU     - Retire tokens unavailable:                 3086  (37.2%)
+SCHEDQ  - Scheduler full:                            0
+LQ      - Load queue full:                           0
+SQ      - Store queue full:                          0
+GROUP   - Static restrictions on the dispatch group: 0
+USH     - Uncategorised Structural Hazard:           0
+
+
+Dispatch Logic - number of cycles where we saw N micro opcodes dispatched:
+[# dispatched], [# cycles]
+ 0,              3088  (37.3%)
+ 1,              1  (0.0%)
+ 3,              100  (1.2%)
+ 5,              1195  (14.4%)
+ 6,              3904  (47.1%)
+
+
+Schedulers - number of cycles where we saw N micro opcodes issued:
+[# issued], [# cycles]
+ 0,          1281  (15.5%)
+ 1,          510  (6.2%)
+ 2,          904  (10.9%)
+ 3,          902  (10.9%)
+ 4,          1204  (14.5%)
+ 5,          1885  (22.7%)
+ 6,          989  (11.9%)
+ 7,          407  (4.9%)
+ 8,          202  (2.4%)
+ 9,          4  (0.0%)
+
+Scheduler's queue usage:
+[1] Resource name.
+[2] Average number of used buffer entries.
+[3] Maximum number of used buffer entries.
+[4] Total number of buffer entries.
+
+ [1]            [2]        [3]        [4]
+ADLPPort00_01_05_06_11 25   70         112
+ADLPPort02_03_07_08_10 23   52         72
+ADLPPort04_09    11         25         48
+
+
+Retire Control Unit - number of cycles where we saw N instructions retired:
+[# retired], [# cycles]
+ 0,           7389  (89.2%)
+ 1,           1  (0.0%)
+ 5,           99  (1.2%)
+ 11,          100  (1.2%)
+ 13,          99  (1.2%)
+ 14,          99  (1.2%)
+ 18,          1  (0.0%)
+ 20,          100  (1.2%)
+ 21,          100  (1.2%)
+ 25,          1  (0.0%)
+ 40,          1  (0.0%)
+ 41,          99  (1.2%)
+ 51,          99  (1.2%)
+ 79,          99  (1.2%)
+ 119,          1  (0.0%)
+
+Total ROB Entries:                512
+Max Used ROB Entries:             476  ( 93.0% )
+Average Used ROB Entries per cy:  423  ( 82.6% )
+
+
+Register File statistics:
+Total number of mappings created:    27100
+Max number of mappings used:         435
+
+
+Resources:
+[0]   - ADLPPort00
+[1]   - ADLPPort01
+[2]   - ADLPPort02
+[3]   - ADLPPort03
+[4]   - ADLPPort04
+[5]   - ADLPPort05
+[6]   - ADLPPort06
+[7]   - ADLPPort07
+[8]   - ADLPPort08
+[9]   - ADLPPort09
+[10]  - ADLPPort10
+[11]  - ADLPPort11
+[12]  - ADLPPortInvalid
+
+
+Resource pressure per iteration:
+[0]    [1]    [2]    [3]    [4]    [5]    [6]    [7]    [8]    [9]    [10]   [11]   [12]   
+39.02  43.00  15.66  15.67  15.50  39.07  33.99  15.50  15.50  15.50  15.67  32.92   -     
+
+Resource pressure by instruction:
+[0]    [1]    [2]    [3]    [4]    [5]    [6]    [7]    [8]    [9]    [10]   [11]   [12]   Instructions:
+ -     0.97    -      -      -     0.01   0.02    -      -      -      -      -      -     endbr64
+ -      -      -      -      -     0.01   0.98    -      -      -      -     0.01    -     test	esi, esi
+ -      -      -      -      -     0.01   0.01    -      -      -      -     0.98    -     mov	ecx, esi
+0.02    -      -      -      -      -     0.98    -      -      -      -      -      -     je	.L7
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	eax, [rsi - 1]
+0.01    -      -      -      -      -     0.01    -      -      -      -     0.98    -     cmp	eax, 2
+0.98    -      -      -      -      -     0.02    -      -      -      -      -      -     jbe	.L8
+0.01    -      -      -      -     0.98    -      -      -      -      -     0.01    -     mov	edx, esi
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rax, rdi
+ -     0.98    -      -      -     0.02    -      -      -      -      -      -      -     vxorpd	xmm0, xmm0, xmm0
+0.99    -      -      -      -      -     0.01    -      -      -      -      -      -     shr	edx, 2
+0.02    -      -      -      -      -     0.98    -      -      -      -      -      -     shl	rdx, 5
+ -      -      -      -      -     0.01   0.01    -      -      -      -     0.98    -     add	rdx, rdi
+ -     0.02   0.32   0.34    -     0.98    -      -      -      -     0.34    -      -     vaddsd	xmm0, xmm0, qword ptr [rax]
+ -      -      -      -      -      -      -      -      -      -      -      -      -     add	rax, 32
+ -     0.98   0.33   0.35    -     0.02    -      -      -      -     0.32    -      -     vaddsd	xmm0, xmm0, qword ptr [rax - 24]
+ -     0.99   0.33   0.34    -     0.01    -      -      -      -     0.33    -      -     vaddsd	xmm0, xmm0, qword ptr [rax - 16]
+ -     0.02   0.33   0.34    -     0.98    -      -      -      -     0.33    -      -     vaddsd	xmm0, xmm0, qword ptr [rax - 8]
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     cmp	rax, rdx
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     jne	.L4
+ -      -      -      -      -     0.97   0.01    -      -      -      -     0.02    -     test	cl, 3
+0.03    -      -      -      -      -     0.97    -      -      -      -      -      -     je	.L1
+ -     0.98    -      -      -     0.02    -      -      -      -      -      -      -     mov	eax, ecx
+0.97   0.02    -      -      -      -      -      -      -      -      -     0.01    -     and	eax, -4
+ -     0.01    -      -      -     0.98   0.01    -      -      -      -      -      -     mov	edx, eax
+ -     0.02   0.33   0.33    -     0.98    -      -      -      -     0.34    -      -     vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	edx, [rax + 1]
+ -      -      -      -      -     0.02    -      -      -      -      -     0.98    -     cmp	edx, ecx
+0.02    -      -      -      -      -     0.98    -      -      -      -      -      -     jae	.L1
+0.97    -      -      -      -     0.01    -      -      -      -      -     0.02    -     add	eax, 2
+ -      -     0.33   0.34    -     1.00    -      -      -      -     0.33    -      -     vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+ -     0.01    -      -      -     0.98   0.01    -      -      -      -      -      -     cmp	eax, ecx
+0.98    -      -      -      -      -     0.02    -      -      -      -      -      -     jae	.L1
+ -     0.99   0.33   0.35    -     0.01    -      -      -      -     0.32    -      -     vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rax]
+0.01    -     0.34   0.32    -      -     0.99    -      -      -     0.34    -      -     ret
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vxorpd	xmm0, xmm0, xmm0
+0.99    -     0.34   0.32    -      -     0.01    -      -      -     0.34    -      -     ret
+0.01   0.97    -      -      -     0.01    -      -      -      -      -     0.01    -     xor	eax, eax
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vxorpd	xmm0, xmm0, xmm0
+ -      -      -      -      -      -      -      -      -      -      -      -      -     jmp	.L3
+0.01    -      -      -      -     0.01   0.98    -      -      -      -      -      -     endbr64
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	r10, [rsp + 8]
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     and	rsp, -32
+ -      -     0.35   0.32   0.50    -      -     0.50   0.50   0.50   0.33    -      -     push	qword ptr [r10 - 8]
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	rbp
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rbp, rsp
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	r15
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	r14
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	r13
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	r12
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	r10
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     push	rbx
+ -      -      -      -      -      -      -      -      -      -      -      -      -     sub	rsp, 64
+ -      -     0.36   0.32    -      -      -      -      -      -     0.32    -      -     mov	rax, qword ptr fs:[40]
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     mov	qword ptr [rbp - 56], rax
+ -     0.01    -      -      -     0.01    -      -      -      -      -     0.98    -     xor	eax, eax
+ -     0.01    -      -      -     0.97   0.01    -      -      -      -     0.01    -     cmp	edi, 1
+0.99    -      -      -      -      -     0.01    -      -      -      -      -      -     jg	.L15
+ -     0.97    -      -      -      -     0.01    -      -      -      -     0.02    -     mov	edi, 8000000
+ -     0.01    -      -      -     0.98   0.01    -      -      -      -      -      -     mov	r15d, 999999
+ -     0.98    -      -      -     0.01    -      -      -      -      -     0.01    -     mov	r12d, 1000000
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	malloc@PLT
+0.01   0.01    -      -      -     0.98    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rbx, rax
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     mov	edx, r12d
+ -     0.01    -      -      -      -     0.99    -      -      -      -      -      -     mov	ecx, 8
+0.01   0.97    -      -      -     0.02    -      -      -      -      -      -      -     vxorpd	xmm5, xmm5, xmm5
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rax, rbx
+0.99    -      -      -      -      -     0.01    -      -      -      -      -      -     shr	edx, 3
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vmovd	xmm7, ecx
+ -      -     0.32   0.33    -      -      -      -      -      -     0.35    -      -     vmovdqa	ymm3, ymmword ptr [rip + .LC1]
+ -      -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     vbroadcastsd	ymm6, qword ptr [rip + .LC4]
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     shl	rdx, 6
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vpbroadcastd	ymm7, xmm7
+0.01    -      -      -      -      -     0.01    -      -      -      -     0.98    -     add	rdx, rbx
+ -      -      -      -      -      -      -      -      -      -      -      -      -     vmovdqa	ymm0, ymm3
+ -      -      -      -      -      -      -      -      -      -      -      -      -     add	rax, 64
+0.01   0.01    -      -      -     0.98    -      -      -      -      -      -      -     vpaddd	ymm3, ymm3, ymm7
+1.00    -      -      -      -     1.00    -      -      -      -      -      -      -     vcvtdq2pd	ymm1, xmm0
+0.99   0.01    -      -      -      -      -      -      -      -      -      -      -     vcmpltpd	ymm2, ymm1, ymm5
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vextracti128	xmm0, ymm0, 1
+0.99   0.01    -      -      -     1.00    -      -      -      -      -      -      -     vcvtdq2pd	ymm0, xmm0
+0.97   0.01    -      -      -     0.02    -      -      -      -      -      -      -     vandpd	ymm2, ymm2, ymm6
+ -     0.01    -      -      -     0.99    -      -      -      -      -      -      -     vaddpd	ymm1, ymm1, ymm2
+ -      -      -      -     0.49    -      -     0.49   0.51   0.51    -      -      -     vmovupd	ymmword ptr [rax - 64], ymm1
+0.02   0.98    -      -      -      -      -      -      -      -      -      -      -     vcmpltpd	ymm1, ymm0, ymm5
+0.97   0.01    -      -      -     0.02    -      -      -      -      -      -      -     vandpd	ymm1, ymm1, ymm6
+ -     0.02    -      -      -     0.98    -      -      -      -      -      -      -     vaddpd	ymm0, ymm0, ymm1
+ -      -      -      -     0.51    -      -     0.51   0.49   0.49    -      -      -     vmovupd	ymmword ptr [rax - 32], ymm0
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     cmp	rdx, rax
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     jne	.L19
+ -     0.02    -      -      -      -     0.01    -      -      -      -     0.97    -     mov	r14d, r12d
+0.01   0.99    -      -      -      -      -      -      -      -      -      -      -     and	r14d, -8
+0.98   0.01    -      -      -      -      -      -      -      -      -     0.01    -     test	r12b, 7
+0.02    -      -      -      -      -     0.98    -      -      -      -      -      -     je	.L48
+ -      -      -      -      -      -      -      -      -      -      -      -      -     vzeroupper
+ -      -      -      -      -      -     0.98    -      -      -      -     0.02    -     mov	eax, r12d
+ -     0.98    -      -      -      -     0.01    -      -      -      -     0.01    -     sub	eax, r14d
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	edx, [rax - 1]
+0.01    -      -      -      -      -      -      -      -      -      -     0.99    -     cmp	edx, 2
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     jbe	.L21
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vmovd	xmm7, r14d
+0.01   0.01    -      -      -     0.98    -      -      -      -      -      -      -     vxorpd	xmm1, xmm1, xmm1
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33    -      -     vmovddup	xmm5, qword ptr [rip + .LC4]
+ -     0.01    -      -      -      -     0.01    -      -      -      -     0.98    -     mov	edx, r14d
+ -      -      -      -      -     1.00    -      -      -      -      -      -      -     vpbroadcastd	xmm0, xmm7
+0.97   0.03   0.34   0.33    -      -      -      -      -      -     0.33    -      -     vpaddd	xmm0, xmm0, xmmword ptr [rip + .LC5]
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	rdx, [rbx + 8*rdx]
+0.99   0.01    -      -      -     1.00    -      -      -      -      -      -      -     vcvtdq2pd	xmm2, xmm0
+ -     0.03    -      -      -     0.97    -      -      -      -      -      -      -     vpshufd	xmm0, xmm0, 238
+0.99   0.01    -      -      -      -      -      -      -      -      -      -      -     vcmpltpd	xmm3, xmm2, xmm1
+0.02   0.98    -      -      -     1.00    -      -      -      -      -      -      -     vcvtdq2pd	xmm0, xmm0
+0.99   0.01    -      -      -      -      -      -      -      -      -      -      -     vcmpltpd	xmm1, xmm0, xmm1
+0.98    -      -      -      -     0.02    -      -      -      -      -      -      -     vandpd	xmm3, xmm3, xmm5
+0.02    -      -      -      -     0.98    -      -      -      -      -      -      -     vandpd	xmm1, xmm1, xmm5
+ -     0.98    -      -      -     0.02    -      -      -      -      -      -      -     vaddpd	xmm2, xmm2, xmm3
+ -     0.99    -      -      -     0.01    -      -      -      -      -      -      -     vaddpd	xmm0, xmm0, xmm1
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovupd	xmmword ptr [rdx], xmm2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovupd	xmmword ptr [rdx + 16], xmm0
+0.01    -      -      -      -      -     0.98    -      -      -      -     0.01    -     mov	edx, eax
+ -     0.01    -      -      -      -     0.01    -      -      -      -     0.98    -     and	edx, -4
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     add	r14d, edx
+0.01   0.98    -      -      -      -      -      -      -      -      -     0.01    -     test	al, 3
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     je	.L22
+0.01    -      -      -      -     0.01   0.01    -      -      -      -     0.97    -     mov	eax, r14d
+1.00    -      -      -      -     1.00    -      -      -      -      -      -      -     vcvtsi2sd	xmm0, xmm4, rax
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbx + 8*rax], xmm0
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	eax, [r14 + 1]
+0.01    -      -      -      -      -     0.01    -      -      -      -     0.98    -     cmp	eax, r12d
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     jae	.L22
+1.00    -      -      -      -     1.00    -      -      -      -      -      -      -     vcvtsi2sd	xmm0, xmm4, rax
+ -      -      -      -      -      -     0.97    -      -      -      -     0.03    -     add	r14d, 2
+ -      -      -      -      -     0.01   0.98    -      -      -      -     0.01    -     cmp	r14d, r12d
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbx + 8*rax], xmm0
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     jae	.L22
+0.01   0.99    -      -      -     1.00    -      -      -      -      -      -      -     vcvtsi2sd	xmm0, xmm4, r14
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbx + 8*r14], xmm0
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	r13, [rbp - 80]
+ -     0.98    -      -      -      -      -      -      -      -      -     0.02    -     mov	edi, 2
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rsi, r13
+ -      -      -      -     0.49    -      -     0.49   0.51   0.51    -      -      -     call	clock_gettime@PLT
+ -     0.99    -      -      -     0.01    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     cmp	r15d, 2
+ -      -     0.32   0.32    -      -      -      -      -      -     0.36    -      -     vmovsd	xmm2, qword ptr [rip + .LC7]
+1.00    -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+0.99   0.01   0.34   0.33    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+0.98   0.02    -      -      -      -      -      -      -      -      -      -      -     vfmadd132sd	xmm1, xmm0, xmm2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbp - 104], xmm1
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     jbe	.L36
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     mov	edx, r12d
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rax, rbx
+0.01   0.99    -      -      -      -      -      -      -      -      -      -      -     vxorpd	xmm1, xmm1, xmm1
+0.97    -      -      -      -      -     0.03    -      -      -      -      -      -     shr	edx, 2
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     shl	rdx, 5
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     add	rdx, rbx
+ -      -     0.33   0.33    -     1.00    -      -      -      -     0.34    -      -     vaddsd	xmm1, xmm1, qword ptr [rax]
+ -      -      -      -      -      -      -      -      -      -      -      -      -     add	rax, 32
+ -      -     0.33   0.34    -     1.00    -      -      -      -     0.33    -      -     vaddsd	xmm1, xmm1, qword ptr [rax - 24]
+ -     0.99   0.32   0.34    -     0.01    -      -      -      -     0.34    -      -     vaddsd	xmm1, xmm1, qword ptr [rax - 16]
+ -     0.02   0.33   0.33    -     0.98    -      -      -      -     0.34    -      -     vaddsd	xmm1, xmm1, qword ptr [rax - 8]
+0.01    -      -      -      -      -      -      -      -      -      -     0.99    -     cmp	rdx, rax
+1.00    -      -      -      -      -      -      -      -      -      -      -      -     jne	.L30
+ -      -      -      -      -      -     0.01    -      -      -      -     0.99    -     test	r12b, 3
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     je	.L32
+ -      -      -      -      -     0.01   0.97    -      -      -      -     0.02    -     mov	eax, r12d
+ -     0.98    -      -      -      -     0.02    -      -      -      -      -      -     and	eax, -4
+ -     0.01    -      -      -      -      -      -      -      -      -     0.99    -     mov	edx, eax
+ -      -     0.33   0.34    -     1.00    -      -      -      -     0.33    -      -     vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	edx, [rax + 1]
+0.01    -      -      -      -      -      -      -      -      -      -     0.99    -     cmp	edx, r12d
+0.99    -      -      -      -      -     0.01    -      -      -      -      -      -     jae	.L32
+ -      -      -      -      -     0.01   0.98    -      -      -      -     0.01    -     add	eax, 2
+ -     0.01   0.34   0.34    -     0.99    -      -      -      -     0.32    -      -     vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+0.02    -      -      -      -      -     0.98    -      -      -      -      -      -     cmp	eax, r12d
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     jae	.L32
+ -     0.98   0.32   0.35    -     0.02    -      -      -      -     0.33    -      -     vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rax]
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rsi, r13
+ -     0.97    -      -      -     0.02   0.01    -      -      -      -      -      -     mov	edi, 2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbp - 96], xmm2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbp - 88], xmm1
+ -      -      -      -     0.51    -      -     0.51   0.49   0.49    -      -      -     call	clock_gettime@PLT
+ -     0.98    -      -      -     0.02    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -     0.33   0.33    -      -      -      -      -      -     0.34    -      -     vmovsd	xmm2, qword ptr [rbp - 96]
+ -      -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     vmovsd	xmm1, qword ptr [rbp - 88]
+0.98   0.02   0.33   0.32    -      -      -      -      -      -     0.35    -      -     vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 72]
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     mov	edi, 2
+ -     0.01    -      -      -      -     0.02    -      -      -      -     0.97    -     mov	eax, 2
+0.02   0.98   0.34   0.34    -      -      -      -      -      -     0.32    -      -     vcvtsi2sd	xmm4, xmm4, qword ptr [rbp - 80]
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	rsi, [rip + .LC8]
+0.03   0.97    -      -      -      -      -      -      -      -      -      -      -     vfmadd132sd	xmm0, xmm4, xmm2
+ -     0.01   0.33   0.33    -     0.99    -      -      -      -     0.34    -      -     vsubsd	xmm0, xmm0, qword ptr [rbp - 104]
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	__printf_chk@PLT
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rdi, rbx
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	free@PLT
+ -      -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     mov	rax, qword ptr [rbp - 56]
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33   1.00    -     sub	rax, qword ptr fs:[40]
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     jne	.L49
+ -      -      -      -      -      -      -      -      -      -      -      -      -     add	rsp, 64
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     xor	eax, eax
+ -      -     0.33   0.33    -      -      -      -      -      -     0.34    -      -     pop	rbx
+ -      -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     pop	r10
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33    -      -     pop	r12
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33    -      -     pop	r13
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33    -      -     pop	r14
+ -      -     0.33   0.33    -      -      -      -      -      -     0.34    -      -     pop	r15
+ -      -     0.33   0.32    -      -      -      -      -      -     0.35    -      -     pop	rbp
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	rsp, [r10 - 8]
+0.02    -     0.34   0.33    -      -     0.98    -      -      -     0.33    -      -     ret
+ -      -     0.33   0.33    -      -      -      -      -      -     0.34    -      -     mov	rdi, qword ptr [rsi + 8]
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     mov	edx, 10
+ -     0.01    -      -      -     0.97   0.01    -      -      -      -     0.01    -     xor	esi, esi
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	strtol@PLT
+ -     0.01    -      -      -      -     0.99    -      -      -      -      -      -     mov	edi, eax
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	r15, rax
+0.01    -      -      -      -      -      -      -      -      -      -     0.99    -     mov	r12d, eax
+ -      -      -      -      -      -     1.00    -      -      -      -      -      -     shl	rdi, 3
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	malloc@PLT
+ -     0.01    -      -      -      -      -      -      -      -      -     0.99    -     test	r15d, r15d
+0.99    -      -      -      -     0.01    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rbx, rax
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     je	.L17
+0.01    -      -      -      -      -     0.99    -      -      -      -      -      -     sub	r15d, 1
+ -     0.98    -      -      -     0.01    -      -      -      -      -     0.01    -     cmp	r15d, 6
+0.99    -      -      -      -      -     0.01    -      -      -      -      -      -     ja	.L16
+0.01    -      -      -      -      -      -      -      -      -      -     0.99    -     xor	r14d, r14d
+ -      -      -      -      -      -      -      -      -      -      -      -      -     jmp	.L18
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	r13, [rbp - 80]
+0.98   0.01    -      -      -      -     0.01    -      -      -      -      -      -     mov	edi, 2
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rsi, r13
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	clock_gettime@PLT
+0.01   0.01    -      -      -     0.98    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -     0.34   0.33    -      -      -      -      -      -     0.33    -      -     vmovsd	xmm2, qword ptr [rip + .LC7]
+1.00    -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+1.00    -     0.35   0.32    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+1.00    -      -      -      -      -      -      -      -      -      -      -      -     vfmadd132sd	xmm1, xmm0, xmm2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbp - 104], xmm1
+0.97   0.01    -      -      -     0.02    -      -      -      -      -      -      -     vxorpd	xmm1, xmm1, xmm1
+ -      -      -      -      -      -      -      -      -      -      -      -      -     jmp	.L32
+ -     1.00    -      -      -      -      -      -      -      -      -      -      -     lea	r13, [rbp - 80]
+ -      -      -      -      -      -      -      -      -      -      -     1.00    -     mov	edi, 2
+ -      -      -      -      -      -      -      -      -      -      -      -      -     vzeroupper
+0.97   0.01    -      -      -      -      -      -      -      -      -     0.02    -     mov	r12d, r14d
+ -      -      -      -      -      -      -      -      -      -      -      -      -     mov	rsi, r13
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	clock_gettime@PLT
+ -     0.98    -      -      -     0.02    -      -      -      -      -      -      -     vxorps	xmm4, xmm4, xmm4
+ -      -     0.33   0.34    -      -      -      -      -      -     0.33    -      -     vmovsd	xmm2, qword ptr [rip + .LC7]
+0.01   0.99   0.34   0.33    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+0.99   0.01   0.32   0.35    -      -      -      -      -      -     0.33    -      -     vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+0.99   0.01    -      -      -      -      -      -      -      -      -      -      -     vfmadd132sd	xmm1, xmm0, xmm2
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     vmovsd	qword ptr [rbp - 104], xmm1
+ -      -      -      -      -      -      -      -      -      -      -      -      -     jmp	.L33
+0.97   0.01    -      -      -     0.02    -      -      -      -      -      -      -     vxorpd	xmm1, xmm1, xmm1
+ -      -      -      -      -      -     0.99    -      -      -      -     0.01    -     xor	eax, eax
+ -      -      -      -      -      -      -      -      -      -      -      -      -     jmp	.L29
+ -      -      -      -     0.50    -      -     0.50   0.50   0.50    -      -      -     call	__stack_chk_fail@PLT
+
+
+Timeline view:
+                    0123456789          0123456789          0123456789          0123456789
+Index     0123456789          0123456789          0123456789          0123456789          
+Truncated display due to cycle limit
+
+
+Average Wait times (based on the timeline view):
+[0]: Executions
+[1]: Average time spent waiting in a scheduler's queue
+[2]: Average time spent waiting in a scheduler's queue while ready
+[3]: Average time elapsed from WB until retire stage
+
+      [0]    [1]    [2]    [3]
+0.     10    1.0    1.0    0.3       endbr64
+1.     10    13.9   0.1    85.4      test	esi, esi
+2.     10    13.9   0.1    87.4      mov	ecx, esi
+3.     10    15.1   0.0    84.4      je	.L7
+4.     10    13.1   0.1    86.4      lea	eax, [rsi - 1]
+5.     10    14.1   0.0    85.4      cmp	eax, 2
+6.     10    14.9   0.0    84.4      jbe	.L8
+7.     10    13.0   0.1    87.3      mov	edx, esi
+8.     10    1.0    1.0    98.3      mov	rax, rdi
+9.     10    22.0   0.1    77.3      vxorpd	xmm0, xmm0, xmm0
+10.    10    12.3   0.1    86.2      shr	edx, 2
+11.    10    13.5   0.2    85.0      shl	rdx, 5
+12.    10    14.5   0.0    84.0      add	rdx, rdi
+13.    10    21.1   0.0    68.2      vaddsd	xmm0, xmm0, qword ptr [rax]
+14.    10    1.0    0.0    97.3      add	rax, 32
+15.    10    24.3   0.0    64.2      vaddsd	xmm0, xmm0, qword ptr [rax - 24]
+16.    10    28.3   0.0    60.2      vaddsd	xmm0, xmm0, qword ptr [rax - 16]
+17.    10    32.1   0.0    56.2      vaddsd	xmm0, xmm0, qword ptr [rax - 8]
+18.    10    13.5   0.0    83.0      cmp	rax, rdx
+19.    10    14.5   0.0    82.0      jne	.L4
+20.    10    11.2   0.9    84.3      test	cl, 3
+21.    10    13.3   0.1    83.2      je	.L1
+22.    10    11.2   1.0    86.1      mov	eax, ecx
+23.    10    11.2   0.0    84.1      and	eax, -4
+24.    10    12.4   0.0    84.1      mov	edx, eax
+25.    10    34.3   0.0    52.2      vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+26.    10    12.5   0.1    83.0      lea	edx, [rax + 1]
+27.    10    13.3   0.0    82.0      cmp	edx, ecx
+28.    10    14.3   0.0    81.0      jae	.L1
+29.    10    11.4   0.0    83.1      add	eax, 2
+30.    10    37.3   0.0    48.2      vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rdx]
+31.    10    12.4   0.0    82.1      cmp	eax, ecx
+32.    10    13.2   0.0    81.1      jae	.L1
+33.    10    40.3   0.0    44.2      vaddsd	xmm0, xmm0, qword ptr [rdi + 8*rax]
+34.    10    1.0    1.0    86.5      ret
+35.    10    50.3   0.0    43.2      vxorpd	xmm0, xmm0, xmm0
+36.    10    1.0    1.0    85.5      ret
+37.    10    10.4   0.0    81.1      xor	eax, eax
+38.    10    50.3   0.0    42.2      vxorpd	xmm0, xmm0, xmm0
+39.    10    0.0    0.0    93.5      jmp	.L3
+40.    10    1.0    1.0    0.0       endbr64
+41.    10    1.3    1.3    98.7      lea	r10, [rsp + 8]
+42.    10    1.0    1.0    97.0      and	rsp, -32
+43.    10    38.3   0.0    60.7      push	qword ptr [r10 - 8]
+44.    10    39.3   0.0    59.7      push	rbp
+45.    10    39.3   0.0    58.7      mov	rbp, rsp
+46.    10    39.3   0.0    58.7      push	r15
+47.    10    40.3   0.0    57.7      push	r14
+48.    10    41.3   0.0    56.7      push	r13
+49.    10    41.3   0.0    55.7      push	r12
+50.    10    42.3   0.0    54.7      push	r10
+51.    10    43.3   0.0    53.7      push	rbx
+52.    10    43.3   0.0    52.7      sub	rsp, 64
+53.    10    1.0    1.0    91.0      mov	rax, qword ptr fs:[40]
+54.    10    42.3   0.0    42.7      mov	qword ptr [rbp - 56], rax
+55.    10    6.2    0.2    88.8      xor	eax, eax
+56.    10    2.4    2.4    93.6      cmp	edi, 1
+57.    10    4.1    0.7    91.9      jg	.L15
+58.    10    1.7    1.7    93.3      mov	edi, 8000000
+59.    10    3.8    3.8    91.2      mov	r15d, 999999
+60.    10    3.8    3.8    91.2      mov	r12d, 1000000
+61.    10    43.3   0.0    0.0       call	malloc@PLT
+62.    10    4.5    4.5    137.8     vxorps	xmm4, xmm4, xmm4
+63.    10    6.2    0.0    135.1     mov	rbx, rax
+64.    10    3.8    0.0    138.5     mov	edx, r12d
+65.    10    3.8    3.8    137.5     mov	ecx, 8
+66.    10    3.8    3.8    137.5     vxorpd	xmm5, xmm5, xmm5
+67.    10    7.2    0.0    134.1     mov	rax, rbx
+68.    10    4.0    0.2    137.3     shr	edx, 3
+69.    10    4.8    0.0    134.5     vmovd	xmm7, ecx
+70.    10    1.0    1.0    133.3     vmovdqa	ymm3, ymmword ptr [rip + .LC1]
+71.    10    1.0    1.0    132.3     vbroadcastsd	ymm6, qword ptr [rip + .LC4]
+72.    10    4.0    0.0    136.3     shl	rdx, 6
+73.    10    7.9    1.1    130.4     vpbroadcastd	ymm7, xmm7
+74.    10    6.2    0.0    134.1     add	rdx, rbx
+75.    10    8.0    0.0    132.3     vmovdqa	ymm0, ymm3
+76.    10    7.2    0.0    133.1     add	rax, 64
+77.    10    11.1   0.0    129.2     vpaddd	ymm3, ymm3, ymm7
+78.    10    8.8    0.8    124.5     vcvtdq2pd	ymm1, xmm0
+79.    10    15.9   0.1    120.4     vcmpltpd	ymm2, ymm1, ymm5
+80.    10    9.8    1.8    127.5     vextracti128	xmm0, ymm0, 1
+81.    10    13.6   0.8    119.7     vcvtdq2pd	ymm0, xmm0
+82.    10    18.9   0.0    119.4     vandpd	ymm2, ymm2, ymm6
+83.    10    19.9   0.0    116.4     vaddpd	ymm1, ymm1, ymm2
+84.    10    38.7   0.9    88.6      vmovupd	ymmword ptr [rax - 64], ymm1
+85.    10    19.6   0.0    115.7     vcmpltpd	ymm1, ymm0, ymm5
+86.    10    23.6   0.0    114.7     vandpd	ymm1, ymm1, ymm6
+87.    10    23.6   0.0    111.7     vaddpd	ymm0, ymm0, ymm1
+88.    10    38.1   0.0    88.2      vmovupd	ymmword ptr [rax - 32], ymm0
+89.    10    5.2    0.0    132.1     cmp	rdx, rax
+90.    10    6.2    0.0    131.1     jne	.L19
+91.    10    1.8    1.1    136.5     mov	r14d, r12d
+92.    10    1.2    0.4    134.1     and	r14d, -8
+93.    10    1.3    1.3    134.0     test	r12b, 7
+94.    10    3.3    0.0    133.0     je	.L48
+95.    10    0.0    0.0    137.3     vzeroupper
+96.    10    2.1    2.1    135.2     mov	eax, r12d
+97.    10    3.2    0.0    133.1     sub	eax, r14d
+98.    10    5.0    0.8    131.3     lea	edx, [rax - 1]
+99.    10    5.0    0.0    130.3     cmp	edx, 2
+100.   10    6.0    0.0    129.3     jbe	.L21
+101.   10    2.5    0.3    130.8     vmovd	xmm7, r14d
+102.   10    1.3    1.3    134.0     vxorpd	xmm1, xmm1, xmm1
+103.   10    1.0    1.0    128.3     vmovddup	xmm5, qword ptr [rip + .LC4]
+104.   10    2.3    0.1    134.0     mov	edx, r14d
+105.   10    6.9    2.4    127.4     vpbroadcastd	xmm0, xmm7
+106.   10    6.9    0.0    120.4     vpaddd	xmm0, xmm0, xmmword ptr [rip + .LC5]
+107.   10    4.0    2.7    130.3     lea	rdx, [rbx + 8*rdx]
+108.   10    16.7   1.8    113.6     vcvtdq2pd	xmm2, xmm0
+109.   10    14.2   0.3    119.1     vpshufd	xmm0, xmm0, 238
+110.   10    20.7   0.0    109.6     vcmpltpd	xmm3, xmm2, xmm1
+111.   10    17.7   2.5    111.6     vcvtdq2pd	xmm0, xmm0
+112.   10    22.7   0.0    107.6     vcmpltpd	xmm1, xmm0, xmm1
+113.   10    24.7   0.0    108.6     vandpd	xmm3, xmm3, xmm5
+114.   10    25.7   0.0    106.6     vandpd	xmm1, xmm1, xmm5
+115.   10    24.7   0.0    105.6     vaddpd	xmm2, xmm2, xmm3
+116.   10    26.7   0.0    103.6     vaddpd	xmm0, xmm0, xmm1
+117.   10    34.4   0.9    86.9      vmovupd	xmmword ptr [rdx], xmm2
+118.   10    34.5   0.9    85.8      vmovupd	xmmword ptr [rdx + 16], xmm0
+119.   10    1.1    1.0    131.2     mov	edx, eax
+120.   10    1.9    0.8    128.4     and	edx, -4
+121.   10    3.9    0.0    127.4     add	r14d, edx
+122.   10    2.1    2.0    128.2     test	al, 3
+123.   10    3.1    0.0    127.2     je	.L22
+124.   10    3.9    0.0    127.4     mov	eax, r14d
+125.   10    6.4    2.5    117.9     vcvtsi2sd	xmm0, xmm4, rax
+126.   10    33.5   0.0    85.8      vmovsd	qword ptr [rbx + 8*rax], xmm0
+127.   10    4.0    1.1    125.3     lea	eax, [r14 + 1]
+128.   10    5.0    0.0    124.3     cmp	eax, r12d
+129.   10    6.0    0.0    123.3     jae	.L22
+130.   10    6.4    1.4    116.9     vcvtsi2sd	xmm0, xmm4, rax
+131.   10    2.9    0.0    126.4     add	r14d, 2
+132.   10    2.9    0.0    125.4     cmp	r14d, r12d
+133.   10    32.5   1.0    84.8      vmovsd	qword ptr [rbx + 8*rax], xmm0
+134.   10    5.4    1.5    122.9     jae	.L22
+135.   10    6.6    3.7    115.7     vcvtsi2sd	xmm0, xmm4, r14
+136.   10    31.5   0.0    84.8      vmovsd	qword ptr [rbx + 8*r14], xmm0
+137.   10    23.0   0.7    104.3     lea	r13, [rbp - 80]
+138.   10    1.7    1.7    125.6     mov	edi, 2
+139.   10    24.0   0.0    103.3     mov	rsi, r13
+140.   10    31.0   2.7    0.0       call	clock_gettime@PLT
+141.   10    3.6    3.6    125.4     vxorps	xmm4, xmm4, xmm4
+142.   10    1.8    1.8    127.2     cmp	r15d, 2
+143.   10    1.0    1.0    122.0     vmovsd	xmm2, qword ptr [rip + .LC7]
+144.   10    21.5   0.2    97.5      vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+145.   10    21.4   1.1    96.6      vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+146.   10    32.4   0.0    92.6      vfmadd132sd	xmm1, xmm0, xmm2
+147.   10    36.8   0.1    80.2      vmovsd	qword ptr [rbp - 104], xmm1
+148.   10    3.2    1.4    124.8     jbe	.L36
+149.   10    1.0    1.0    127.0     mov	edx, r12d
+150.   10    1.0    1.0    126.0     mov	rax, rbx
+151.   10    33.3   0.0    91.6      vxorpd	xmm1, xmm1, xmm1
+152.   10    2.1    1.2    122.8     shr	edx, 2
+153.   10    3.1    0.0    121.8     shl	rdx, 5
+154.   10    4.1    0.0    120.8     add	rdx, rbx
+155.   10    32.4   0.0    82.6      vaddsd	xmm1, xmm1, qword ptr [rax]
+156.   10    1.0    0.1    122.9     add	rax, 32
+157.   10    36.3   0.0    78.6      vaddsd	xmm1, xmm1, qword ptr [rax - 24]
+158.   10    40.3   0.0    74.6      vaddsd	xmm1, xmm1, qword ptr [rax - 16]
+159.   10    43.4   0.0    70.6      vaddsd	xmm1, xmm1, qword ptr [rax - 8]
+160.   10    3.1    0.0    119.8     cmp	rdx, rax
+161.   10    4.1    0.0    118.8     jne	.L30
+162.   10    1.0    1.0    120.9     test	r12b, 3
+163.   10    3.2    0.2    119.7     je	.L32
+164.   10    1.0    1.0    122.0     mov	eax, r12d
+165.   10    1.2    0.2    119.8     and	eax, -4
+166.   10    3.1    0.0    119.8     mov	edx, eax
+167.   10    46.3   0.0    66.6      vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+168.   10    3.6    0.5    118.3     lea	edx, [rax + 1]
+169.   10    3.7    0.0    117.3     cmp	edx, r12d
+170.   10    4.7    0.0    116.3     jae	.L32
+171.   10    2.1    0.0    118.8     add	eax, 2
+172.   10    49.3   0.0    62.6      vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rdx]
+173.   10    3.1    0.0    117.8     cmp	eax, r12d
+174.   10    3.2    0.0    116.8     jae	.L32
+175.   10    52.3   0.0    58.6      vaddsd	xmm1, xmm1, qword ptr [rbx + 8*rax]
+176.   10    14.4   0.1    105.5     mov	rsi, r13
+177.   10    1.8    1.8    118.1     mov	edi, 2
+178.   10    52.3   0.0    56.6      vmovsd	qword ptr [rbp - 96], xmm2
+179.   10    61.3   0.0    46.6      vmovsd	qword ptr [rbp - 88], xmm1
+180.   10    20.0   2.8    0.0       call	clock_gettime@PLT
+181.   10    2.1    2.1    116.9     vxorps	xmm4, xmm4, xmm4
+182.   10    11.9   0.1    101.1     vmovsd	xmm2, qword ptr [rbp - 96]
+183.   10    11.0   0.1    101.0     vmovsd	xmm1, qword ptr [rbp - 88]
+184.   10    12.9   1.7    95.1      vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 72]
+185.   10    1.0    1.0    117.0     mov	edi, 2
+186.   10    1.7    1.7    116.3     mov	eax, 2
+187.   10    12.2   2.0    94.8      vcvtsi2sd	xmm4, xmm4, qword ptr [rbp - 80]
+188.   10    2.4    2.4    114.6     lea	rsi, [rip + .LC8]
+189.   10    23.2   0.0    90.8      vfmadd132sd	xmm0, xmm4, xmm2
+190.   10    23.2   0.0    84.8      vsubsd	xmm0, xmm0, qword ptr [rbp - 104]
+191.   10    18.2   3.7    0.0       call	__printf_chk@PLT
+192.   10    1.0    1.0    116.2     mov	rdi, rbx
+193.   10    18.2   3.7    0.0       call	free@PLT
+194.   10    10.1   1.0    103.1     mov	rax, qword ptr [rbp - 56]
+195.   10    9.4    0.3    101.8     sub	rax, qword ptr fs:[40]
+196.   10    15.4   0.0    100.8     jne	.L49
+197.   10    13.7   0.1    102.5     add	rsp, 64
+198.   10    15.4   0.0    99.8      xor	eax, eax
+199.   10    14.7   0.0    97.5      pop	rbx
+200.   10    19.7   0.0    92.5      pop	r10
+201.   10    23.7   0.0    87.5      pop	r12
+202.   10    28.7   0.0    82.5      pop	r13
+203.   10    33.7   0.0    77.5      pop	r14
+204.   10    38.7   0.0    72.5      pop	r15
+205.   10    43.7   0.0    67.5      pop	rbp
+206.   10    23.7   0.0    91.5      lea	rsp, [r10 - 8]
+207.   10    1.0    1.0    107.2     ret
+208.   10    1.1    0.8    109.1     mov	rdi, qword ptr [rsi + 8]
+209.   10    1.0    1.0    113.2     mov	edx, 10
+210.   10    1.1    0.8    112.1     xor	esi, esi
+211.   10    22.7   0.0    0.0       call	strtol@PLT
+212.   10    14.4   0.0    108.3     mov	edi, eax
+213.   10    1.5    0.9    92.7      mov	r15, rax
+214.   10    1.5    0.9    93.7      mov	r12d, eax
+215.   10    1.5    0.9    92.7      shl	rdi, 3
+216.   10    1.8    0.9    0.0       call	malloc@PLT
+217.   10    2.4    0.0    97.4      test	r15d, r15d
+218.   10    1.8    0.9    99.0      vxorps	xmm4, xmm4, xmm4
+219.   10    1.4    0.9    98.5      mov	rbx, rax
+220.   10    3.5    0.0    96.4      je	.L17
+221.   10    1.5    0.0    98.4      sub	r15d, 1
+222.   10    2.4    0.0    97.4      cmp	r15d, 6
+223.   10    3.4    0.0    96.4      ja	.L16
+224.   10    8.1    0.0    90.7      xor	r14d, r14d
+225.   10    0.0    0.0    100.8     jmp	.L18
+226.   10    18.1   0.0    81.7      lea	r13, [rbp - 80]
+227.   10    1.0    1.0    97.9      mov	edi, 2
+228.   10    18.2   0.0    80.7      mov	rsi, r13
+229.   10    1.7    1.0    0.0       call	clock_gettime@PLT
+230.   10    2.5    1.7    98.2      vxorps	xmm4, xmm4, xmm4
+231.   10    1.0    1.0    93.7      vmovsd	xmm2, qword ptr [rip + .LC7]
+232.   10    16.2   0.0    73.6      vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+233.   10    17.1   1.0    72.6      vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+234.   10    28.1   0.0    68.6      vfmadd132sd	xmm1, xmm0, xmm2
+235.   10    31.2   0.0    56.6      vmovsd	qword ptr [rbp - 104], xmm1
+236.   10    31.2   0.0    67.6      vxorpd	xmm1, xmm1, xmm1
+237.   10    0.0    0.0    99.7      jmp	.L32
+238.   10    16.1   1.0    82.6      lea	r13, [rbp - 80]
+239.   10    1.0    1.0    97.7      mov	edi, 2
+240.   10    0.0    0.0    99.7      vzeroupper
+241.   10    7.1    0.0    92.6      mov	r12d, r14d
+242.   10    16.2   0.0    81.6      mov	rsi, r13
+243.   10    1.5    1.0    0.0       call	clock_gettime@PLT
+244.   10    1.0    1.0    99.5      vxorps	xmm4, xmm4, xmm4
+245.   10    1.0    1.0    93.4      vmovsd	xmm2, qword ptr [rip + .LC7]
+246.   10    16.1   2.0    74.3      vcvtsi2sd	xmm1, xmm4, qword ptr [rbp - 72]
+247.   10    15.2   2.0    74.3      vcvtsi2sd	xmm0, xmm4, qword ptr [rbp - 80]
+248.   10    26.2   0.0    70.3      vfmadd132sd	xmm1, xmm0, xmm2
+249.   10    30.1   0.0    58.3      vmovsd	qword ptr [rbp - 104], xmm1
+250.   10    0.0    0.0    100.4     jmp	.L33
+251.   10    30.1   0.0    69.3      vxorpd	xmm1, xmm1, xmm1
+252.   10    1.0    1.0    96.5      xor	eax, eax
+253.   10    0.0    0.0    99.5      jmp	.L29
+254.   10    1.4    1.1    0.0       call	__stack_chk_fail@PLT
+       10    13.9   0.6    95.2      <total>
