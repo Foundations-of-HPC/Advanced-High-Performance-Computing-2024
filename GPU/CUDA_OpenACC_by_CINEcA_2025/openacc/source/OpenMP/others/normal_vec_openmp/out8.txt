@@ -1,0 +1,27 @@
+
+Vector addition
+  C/OpenMP version
+
+  A program which adds two vector.
+
+  Number of processors available = 4
+  Number of threads =              8
+
+   i        a[i]        b[i]      c[i] = a[i] + b[i]
+
+   0      1.0000      2.0000      3.0000
+   1      1.0000      2.0000      3.0000
+   2      1.0000      2.0000      3.0000
+   3      1.0000      2.0000      3.0000
+   4      1.0000      2.0000      3.0000
+   5      1.0000      2.0000      3.0000
+   6      1.0000      2.0000      3.0000
+   7      1.0000      2.0000      3.0000
+   8      1.0000      2.0000      3.0000
+   9      1.0000      2.0000      3.0000
+
+Vector addition
+  Normal end of execution.
+===================================== 
+Work took 0.017006 seconds
+===================================== 

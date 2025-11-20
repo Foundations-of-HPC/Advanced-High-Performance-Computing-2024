@@ -1,0 +1,162 @@
+=== Vector Size: 1000000 ===
+Vector Addition Performance Test
+Vector size: 1000000 elements (3 MB per vector)
+
+Single Thread (GPU):
+  Time: 834387756 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 4045824 ns
+  Speedup: 206x
+  Bandwidth: 3 GB/s
+
+Multiple Blocks (3907 blocks, 256 threads each):
+  Time: 17408 ns
+  Speedup: 47931x
+  Bandwidth: 689 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+
+=== Vector Size: 2500000 ===
+Vector Addition Performance Test
+Vector size: 2500000 elements (9 MB per vector)
+
+Single Thread (GPU):
+  Time: 2059921386 ns
+  Speedup: 1x
+  Bandwidth: 15 MB/s
+
+Single Block (256 threads):
+  Time: 13262847 ns
+  Speedup: 155x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 31743 ns
+  Speedup: 64894x
+  Bandwidth: 945 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+
+=== Vector Size: 5000000 ===
+Vector Addition Performance Test
+Vector size: 5000000 elements (19 MB per vector)
+
+Single Thread (GPU):
+  Time: 4201200683 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 30648319 ns
+  Speedup: 137x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 58368 ns
+  Speedup: 71978x
+  Bandwidth: 1028 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+
+=== Vector Size: 10000000 ===
+Vector Addition Performance Test
+Vector size: 10000000 elements (38 MB per vector)
+
+Single Thread (GPU):
+  Time: 8420867187 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 61241344 ns
+  Speedup: 138x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 109567 ns
+  Speedup: 76856x
+  Bandwidth: 1095 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+
+=== Vector Size: 20000000 ===
+Vector Addition Performance Test
+Vector size: 20000000 elements (76 MB per vector)
+
+Single Thread (GPU):
+  Time: 16842566406 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 122996734 ns
+  Speedup: 137x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 211968 ns
+  Speedup: 79458x
+  Bandwidth: 1132 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+
+=== Vector Size: 40000000 ===
+Vector Addition Performance Test
+Vector size: 40000000 elements (152 MB per vector)
+
+Single Thread (GPU):
+  Time: 33682191406 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 245811203 ns
+  Speedup: 137x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 418816 ns
+  Speedup: 80422x
+  Bandwidth: 1146 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024
+
+

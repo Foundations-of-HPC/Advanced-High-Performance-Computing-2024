@@ -1,0 +1,112 @@
+
+=== Device Information ===
+Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Global Memory: 63.42 GB
+Shared Memory per Block: 49152 bytes
+Max Threads per Block: 1024
+Multiprocessors: 124
+Memory Clock Rate: 1.59 GHz
+Memory Bus Width: 4096 bits
+Peak Memory Bandwidth: 1631.23 GB/s
+=== CUDA Matrix Multiplication with Unified Memory ===
+Size     CPU_Time(ms) GPU_Time(ms) Speedup      Bandwidth    Validation   GFLOPS      
+----     ------------ ------------ -------      ---------    ----------   ------      
+
+=== Problem Size: 32x32x32 ===
+Running CPU computation...
+Grid size: (2, 2), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 32x32x32
+CPU Time: 0.01 ms
+GPU Time: 0.07 ms
+Speedup: 0.11x
+Memory Bandwidth: 0.17 GB/s
+Performance: 0.91 GFLOPS
+Validation: PASSED
+Summary  0.01         0.07         0.11        x 0.17         PASSED       0.91        
+
+
+=== Problem Size: 64x64x64 ===
+Running CPU computation...
+Grid size: (4, 4), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 64x64x64
+CPU Time: 0.05 ms
+GPU Time: 0.11 ms
+Speedup: 0.43x
+Memory Bandwidth: 0.47 GB/s
+Performance: 4.97 GFLOPS
+Validation: PASSED
+Summary  0.05         0.11         0.43        x 0.47         PASSED       4.97        
+
+
+=== Problem Size: 128x128x128 ===
+Running CPU computation...
+Grid size: (8, 8), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 128x128x128
+CPU Time: 0.33 ms
+GPU Time: 0.17 ms
+Speedup: 1.99x
+Memory Bandwidth: 1.17 GB/s
+Performance: 24.98 GFLOPS
+Validation: PASSED
+Summary  0.33         0.17         1.99        x 1.17         PASSED       24.98       
+
+
+=== Problem Size: 256x256x256 ===
+Running CPU computation...
+Grid size: (16, 16), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 256x256x256
+CPU Time: 2.56 ms
+GPU Time: 0.32 ms
+Speedup: 8.05x
+Memory Bandwidth: 2.47 GB/s
+Performance: 105.36 GFLOPS
+Validation: PASSED
+Summary  2.56         0.32         8.05        x 2.47         PASSED       105.36      
+
+
+=== Problem Size: 512x512x512 ===
+Running CPU computation...
+Grid size: (32, 32), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 512x512x512
+CPU Time: 20.25 ms
+GPU Time: 1.14 ms
+Speedup: 17.73x
+Memory Bandwidth: 2.76 GB/s
+Performance: 235.11 GFLOPS
+Validation: PASSED
+Summary  20.25        1.14         17.73       x 2.76         PASSED       235.11      
+
+
+=== Problem Size: 1024x1024x1024 ===
+Running CPU computation...
+Grid size: (64, 64), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 1024x1024x1024
+CPU Time: 187.45 ms
+GPU Time: 5.59 ms
+Speedup: 33.52x
+Memory Bandwidth: 2.25 GB/s
+Performance: 384.02 GFLOPS
+Validation: PASSED
+Summary  187.45       5.59         33.52       x 2.25         PASSED       384.02      
+
+
+=== Problem Size: 2048x2048x2048 ===
+Running CPU computation...
+Grid size: (128, 128), Block size: (16, 16)
+Running GPU computation...
+Problem Size: 2048x2048x2048
+CPU Time: 1477.83 ms
+GPU Time: 40.79 ms
+Speedup: 36.23x
+Memory Bandwidth: 1.23 GB/s
+Performance: 421.19 GFLOPS
+Validation: PASSED
+Summary  1477.83      40.79        36.23       x 1.23         PASSED       421.19      
+

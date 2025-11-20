@@ -1,0 +1,376 @@
+// Matmul_overlapped.cu
+#include <stdio.h>
+#include <stdlib.h>
+#include <cuda_runtime.h>
+#include <math.h>
+#include <sys/time.h>
+#include <nvtx3/nvToolsExt.h>  // For NVTX profiling
+
+#define CHECK_CUDA(call) \
+    { \
+        cudaError_t err = call; \
+        if (err != cudaSuccess) { \
+            fprintf(stderr, "CUDA error in %s (%s:%d): %s\n", #call, __FILE__, __LINE__, cudaGetErrorString(err)); \
+            exit(EXIT_FAILURE); \
+        } \
+    }
+
+// Tile size for shared memory blocks
+#define TILE_SIZE 16
+#define NUM_STREAMS 3  // Number of streams for overlap
+
+void naive_cpu_matmul(float *A, float *B, float *C, int M, int N, int K) {
+    for (int i = 0; i < M; i++) {
+        for (int k = 0; k < K; k++) {
+            for (int j = 0; j < N; j++) {
+                C[i * N + j] += A[i * K + k] * B[k * N + j];
+            }
+        }
+    }
+}
+
+// Shared memory optimized kernel
+__global__ void matmul_shared_kernel(float *A, float *B, float *C, int M, int N, int K) {
+    // Shared memory for tiles of A and B
+    __shared__ float s_A[TILE_SIZE][TILE_SIZE];
+    __shared__ float s_B[TILE_SIZE][TILE_SIZE];
+
+    // Thread indices within block
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    
+    // Output element position
+    int row = blockIdx.y * TILE_SIZE + ty;
+    int col = blockIdx.x * TILE_SIZE + tx;
+    
+    float sum = 0.0f;
+
+    // Loop over tiles in the K dimension
+    for (int k = 0; k < K; k += TILE_SIZE) {
+        // Load tile of A into shared memory
+        if (row < M && (k + tx) < K) {
+            s_A[ty][tx] = A[row * K + k + tx];
+        } else {
+            s_A[ty][tx] = 0.0f;
+        }
+
+        // Load tile of B into shared memory
+        if ((k + ty) < K && col < N) {
+            s_B[ty][tx] = B[(k + ty) * N + col];
+        } else {
+            s_B[ty][tx] = 0.0f;
+        }
+
+        __syncthreads();
+
+        // Compute partial product from tiles
+        for (int i = 0; i < TILE_SIZE; i++) {
+            sum += s_A[ty][i] * s_B[i][tx];
+        }
+
+        __syncthreads();
+    }
+
+    // Write result to global memory
+    if (row < M && col < N) {
+        C[row * N + col] = sum;
+    }
+}
+
+// Kernel for processing chunks of the matrix
+__global__ void matmul_shared_chunk(float *A, float *B, float *C, 
+                                   int M, int N, int K, 
+                                   int chunk_start, int chunk_rows) {
+    // Shared memory for tiles of A and B
+    __shared__ float s_A[TILE_SIZE][TILE_SIZE];
+    __shared__ float s_B[TILE_SIZE][TILE_SIZE];
+
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+    
+    // Adjust row for chunk processing
+    int local_row = blockIdx.y * TILE_SIZE + ty;
+    int global_row = chunk_start + local_row;
+    int col = blockIdx.x * TILE_SIZE + tx;
+    
+    if (local_row >= chunk_rows || global_row >= M) return;
+    
+    float sum = 0.0f;
+
+    for (int k = 0; k < K; k += TILE_SIZE) {
+        // Load tile of A into shared memory
+        if (global_row < M && (k + tx) < K) {
+            s_A[ty][tx] = A[global_row * K + k + tx];
+        } else {
+            s_A[ty][tx] = 0.0f;
+        }
+
+        // Load tile of B into shared memory
+        if ((k + ty) < K && col < N) {
+            s_B[ty][tx] = B[(k + ty) * N + col];
+        } else {
+            s_B[ty][tx] = 0.0f;
+        }
+
+        __syncthreads();
+
+        for (int i = 0; i < TILE_SIZE; i++) {
+            sum += s_A[ty][i] * s_B[i][tx];
+        }
+
+        __syncthreads();
+    }
+
+    if (global_row < M && col < N) {
+        C[global_row * N + col] = sum;
+    }
+}
+
+void init_matrix(float *mat, int size, float val) {
+    for (int i = 0; i < size; i++) {
+        mat[i] = val;
+    }
+}
+
+bool compare_matrices(float *ref, float *test, int size, float eps = 1e-3) {
+    for (int i = 0; i < size; i++) {
+        if (fabs(ref[i] - test[i]) > eps) {
+            printf("Mismatch at index %d: CPU=%.3f, GPU=%.3f\n", i, ref[i], test[i]);
+            return false;
+        }
+    }
+    return true;
+}
+
+double get_time_ms() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (double)tv.tv_sec * 1000.0 + (double)tv.tv_usec / 1000.0;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        printf("Usage: %s M N K\n", argv[0]);
+        return 1;
+    }
+
+    int M = atoi(argv[1]);
+    int N = atoi(argv[2]);
+    int K = atoi(argv[3]);
+
+    printf("Matrix dimensions: M=%d, N=%d, K=%d\n", M, N, K);
+    printf("Using %d streams for overlapped execution...\n", NUM_STREAMS);
+
+    // Allocate pinned host memory
+    float *A, *B, *C_cpu, *C_gpu_sync, *C_gpu_overlap;
+    CHECK_CUDA(cudaMallocHost(&A, M * K * sizeof(float)));
+    CHECK_CUDA(cudaMallocHost(&B, K * N * sizeof(float)));
+    CHECK_CUDA(cudaMallocHost(&C_cpu, M * N * sizeof(float)));
+    CHECK_CUDA(cudaMallocHost(&C_gpu_sync, M * N * sizeof(float)));
+    CHECK_CUDA(cudaMallocHost(&C_gpu_overlap, M * N * sizeof(float)));
+
+    // Initialize matrices
+    init_matrix(A, M * K, 1.0f);
+    init_matrix(B, K * N, 1.0f);
+    init_matrix(C_cpu, M * N, 0.0f);
+    init_matrix(C_gpu_sync, M * N, 0.0f);
+    init_matrix(C_gpu_overlap, M * N, 0.0f);
+
+    // Allocate device memory
+    float *d_A, *d_B, *d_C;
+    CHECK_CUDA(cudaMalloc(&d_A, M * K * sizeof(float)));
+    CHECK_CUDA(cudaMalloc(&d_B, K * N * sizeof(float)));
+    CHECK_CUDA(cudaMalloc(&d_C, M * N * sizeof(float)));
+
+    // Create streams and events
+    cudaStream_t streams[NUM_STREAMS];
+    cudaEvent_t events[NUM_STREAMS * 2]; // start and stop events for each stream
+    
+    for (int i = 0; i < NUM_STREAMS; i++) {
+        CHECK_CUDA(cudaStreamCreate(&streams[i]));
+        CHECK_CUDA(cudaEventCreate(&events[i * 2]));     // start event
+        CHECK_CUDA(cudaEventCreate(&events[i * 2 + 1])); // stop event
+    }
+
+    // Create events for overall timing
+    cudaEvent_t total_start, total_stop;
+    CHECK_CUDA(cudaEventCreate(&total_start));
+    CHECK_CUDA(cudaEventCreate(&total_stop));
+
+    dim3 block(TILE_SIZE, TILE_SIZE);
+    dim3 grid((N + block.x - 1) / block.x, (M + block.y - 1) / block.y);
+
+    // ================= CPU Computation =================
+    printf("\n--- CPU Computation ---\n");
+    double start_cpu = get_time_ms();
+    naive_cpu_matmul(A, B, C_cpu, M, N, K);
+    double end_cpu = get_time_ms();
+    printf("CPU execution time: %.2f ms\n", end_cpu - start_cpu);
+
+    // ================= Synchronous GPU Execution =================
+    printf("\n--- Synchronous GPU Execution ---\n");
+    nvtxRangePushA("Synchronous GPU Total");
+    
+    CHECK_CUDA(cudaEventRecord(total_start));
+    
+    // Transfer all data first
+    CHECK_CUDA(cudaMemcpy(d_A, A, M * K * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemcpy(d_B, B, K * N * sizeof(float), cudaMemcpyHostToDevice));
+    CHECK_CUDA(cudaMemset(d_C, 0, M * N * sizeof(float)));
+    
+    // Execute kernel
+    matmul_shared_kernel<<<grid, block>>>(d_A, d_B, d_C, M, N, K);
+    CHECK_CUDA(cudaGetLastError());
+    
+    // Transfer result back
+    CHECK_CUDA(cudaMemcpy(C_gpu_sync, d_C, M * N * sizeof(float), cudaMemcpyDeviceToHost));
+    
+    CHECK_CUDA(cudaEventRecord(total_stop));
+    CHECK_CUDA(cudaEventSynchronize(total_stop));
+    
+    float sync_time;
+    CHECK_CUDA(cudaEventElapsedTime(&sync_time, total_start, total_stop));
+    
+    nvtxRangePop();
+    
+    bool valid_sync = compare_matrices(C_cpu, C_gpu_sync, M * N);
+    printf("Results: %s\n", valid_sync ? "PASS" : "FAIL");
+    printf("Total time: %.2f ms\n", sync_time);
+    printf("Speedup: %.2fx\n", (end_cpu - start_cpu) / sync_time);
+
+    // ================= Overlapped GPU Execution =================
+    printf("\n--- Overlapped GPU Execution ---\n");
+    nvtxRangePushA("Overlapped GPU Total");
+    
+    // Calculate chunk sizes for overlapping
+    int chunk_size = (M + NUM_STREAMS - 1) / NUM_STREAMS;
+    int A_chunk_bytes = chunk_size * K * sizeof(float);
+    int C_chunk_bytes = chunk_size * N * sizeof(float);
+    
+    printf("Processing in %d chunks of ~%d rows each\n", NUM_STREAMS, chunk_size);
+    
+    CHECK_CUDA(cudaEventRecord(total_start));
+    
+    // Transfer matrix B once (it's used by all chunks)
+    CHECK_CUDA(cudaMemcpyAsync(d_B, B, K * N * sizeof(float), cudaMemcpyHostToDevice, streams[0]));
+    CHECK_CUDA(cudaMemsetAsync(d_C, 0, M * N * sizeof(float), streams[0]));
+    
+    // Process chunks with overlapping
+    for (int chunk = 0; chunk < NUM_STREAMS; chunk++) {
+        int chunk_start = chunk * chunk_size;
+        int actual_chunk_size = min(chunk_size, M - chunk_start);
+        
+        if (actual_chunk_size <= 0) break;
+        
+        nvtxRangePushA(("Chunk " + std::to_string(chunk)).c_str());
+        
+        // Record start event for this chunk
+        CHECK_CUDA(cudaEventRecord(events[chunk * 2], streams[chunk]));
+        
+        // Transfer A chunk to device
+        CHECK_CUDA(cudaMemcpyAsync(d_A + chunk_start * K, 
+                                  A + chunk_start * K, 
+                                  actual_chunk_size * K * sizeof(float),
+                                  cudaMemcpyHostToDevice, 
+                                  streams[chunk]));
+        
+        // Execute kernel for this chunk
+        dim3 chunk_grid((N + block.x - 1) / block.x, 
+                       (actual_chunk_size + block.y - 1) / block.y);
+        
+        matmul_shared_chunk<<<chunk_grid, block, 0, streams[chunk]>>>(
+            d_A, d_B, d_C, M, N, K, chunk_start, actual_chunk_size);
+        
+        CHECK_CUDA(cudaGetLastError());
+        
+        // Transfer result chunk back to host
+        CHECK_CUDA(cudaMemcpyAsync(C_gpu_overlap + chunk_start * N,
+                                  d_C + chunk_start * N,
+                                  actual_chunk_size * N * sizeof(float),
+                                  cudaMemcpyDeviceToHost,
+                                  streams[chunk]));
+        
+        // Record stop event for this chunk
+        CHECK_CUDA(cudaEventRecord(events[chunk * 2 + 1], streams[chunk]));
+        
+        nvtxRangePop();
+    }
+    
+    // Wait for all streams to complete
+    for (int i = 0; i < NUM_STREAMS; i++) {
+        CHECK_CUDA(cudaStreamSynchronize(streams[i]));
+    }
+    
+    CHECK_CUDA(cudaEventRecord(total_stop));
+    CHECK_CUDA(cudaEventSynchronize(total_stop));
+    
+    float overlap_time;
+    CHECK_CUDA(cudaEventElapsedTime(&overlap_time, total_start, total_stop));
+    
+    nvtxRangePop();
+    
+    bool valid_overlap = compare_matrices(C_cpu, C_gpu_overlap, M * N);
+    printf("Results: %s\n", valid_overlap ? "PASS" : "FAIL");
+    printf("Total time: %.2f ms\n", overlap_time);
+    printf("Speedup: %.2fx\n", (end_cpu - start_cpu) / overlap_time);
+
+    // ================= Performance Analysis =================
+    printf("\n=== Performance Analysis ===\n");
+    printf("CPU Time: %.2f ms\n", end_cpu - start_cpu);
+    printf("GPU Synchronous: %.2f ms (%.2fx speedup)\n", sync_time, (end_cpu - start_cpu) / sync_time);
+    printf("GPU Overlapped:  %.2f ms (%.2fx speedup)\n", overlap_time, (end_cpu - start_cpu) / overlap_time);
+    
+    if (overlap_time < sync_time) {
+        printf("Overlapping achieved %.2fx improvement over synchronous execution\n", sync_time / overlap_time);
+        printf("Efficiency gain: %.1f%%\n", ((sync_time - overlap_time) / sync_time) * 100.0);
+    } else {
+        printf("Synchronous execution was %.2fx faster (overlap overhead)\n", overlap_time / sync_time);
+    }
+
+    // Analyze individual chunk timings
+    printf("\n--- Chunk Timing Analysis ---\n");
+    float total_chunk_time = 0;
+    for (int i = 0; i < NUM_STREAMS; i++) {
+        float chunk_time;
+        if (cudaEventElapsedTime(&chunk_time, events[i * 2], events[i * 2 + 1]) == cudaSuccess) {
+            printf("Chunk %d: %.2f ms\n", i, chunk_time);
+            total_chunk_time += chunk_time;
+        }
+    }
+    printf("Sum of individual chunks: %.2f ms\n", total_chunk_time);
+    printf("Overlap efficiency: %.1f%% (lower is better overlap)\n", 
+           (overlap_time / total_chunk_time) * 100.0);
+
+    // Memory bandwidth analysis
+    double total_data_mb = (M * K + K * N + M * N) * sizeof(float) / (1024.0 * 1024.0);
+    printf("\n--- Memory Bandwidth ---\n");
+    printf("Total data: %.2f MB\n", total_data_mb);
+    printf("Synchronous bandwidth: %.2f GB/s\n", total_data_mb / sync_time);
+    printf("Overlapped bandwidth: %.2f GB/s\n", total_data_mb / overlap_time);
+
+    // Verify both results match
+    bool results_match = compare_matrices(C_gpu_sync, C_gpu_overlap, M * N);
+    printf("\nSync vs Overlap results match: %s\n", results_match ? "YES" : "NO");
+
+    // Cleanup
+    CHECK_CUDA(cudaFreeHost(A));
+    CHECK_CUDA(cudaFreeHost(B));
+    CHECK_CUDA(cudaFreeHost(C_cpu));
+    CHECK_CUDA(cudaFreeHost(C_gpu_sync));
+    CHECK_CUDA(cudaFreeHost(C_gpu_overlap));
+    
+    CHECK_CUDA(cudaFree(d_A));
+    CHECK_CUDA(cudaFree(d_B));
+    CHECK_CUDA(cudaFree(d_C));
+    
+    for (int i = 0; i < NUM_STREAMS; i++) {
+        CHECK_CUDA(cudaStreamDestroy(streams[i]));
+        CHECK_CUDA(cudaEventDestroy(events[i * 2]));
+        CHECK_CUDA(cudaEventDestroy(events[i * 2 + 1]));
+    }
+    
+    CHECK_CUDA(cudaEventDestroy(total_start));
+    CHECK_CUDA(cudaEventDestroy(total_stop));
+
+    return 0;
+}

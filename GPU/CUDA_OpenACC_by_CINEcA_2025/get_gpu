@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# source this file to enable get_gpu command from console
+# or execute it to run get_gpu command
+
+function get_gpu () {
+
+  command="srun -X -t 10 -N 1 -n 1 --cpus-per-task=4 --mem=1GB --gres=gpu:1 -p boost_usr_prod -A tra25_gputs --reservation=s_tra_gputs --pty /usr/bin/bash"
+
+  echo -e "\n# Waiting to log into a compute node with GPU resources ..."
+  echo $command
+  $command
+}
+
+[[ "${BASH_SOURCE[0]}" == "${0}" ]] && get_gpu  
+[[ "${BASH_SOURCE[0]}" != "${0}" ]] && echo "Well done! Now you can use get_gpu command to log into a compute node"  

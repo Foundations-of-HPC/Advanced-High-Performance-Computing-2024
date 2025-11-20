@@ -1,0 +1,24 @@
+Vector Addition Performance Test
+Vector size: 40000000 elements (152 MB per vector)
+
+Single Thread (GPU):
+  Time: 33682191406 ns
+  Speedup: 1x
+  Bandwidth: 14 MB/s
+
+Single Block (256 threads):
+  Time: 245811203 ns
+  Speedup: 137x
+  Bandwidth: 2 GB/s
+
+Multiple Blocks (3968 blocks, 256 threads each):
+  Time: 418816 ns
+  Speedup: 80422x
+  Bandwidth: 1146 GB/s
+
+Results verification: PASSED
+
+GPU Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Multiprocessors: 124
+Max Threads per Block: 1024

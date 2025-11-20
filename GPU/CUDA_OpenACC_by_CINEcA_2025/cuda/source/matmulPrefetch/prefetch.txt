@@ -1,0 +1,141 @@
+
+=== Device Information ===
+Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Global Memory: 63.42 GB
+Shared Memory per Block: 49152 bytes
+Max Threads per Block: 1024
+Multiprocessors: 124
+Memory Clock Rate: 1.59 GHz
+Memory Bus Width: 4096 bits
+Peak Memory Bandwidth: 1631.23 GB/s
+
+--------------------------------------------------------
+
+=== Memory Prefetching Strategy ===
+1. Data prefetched to CPU before CPU computation
+2. Data prefetched to GPU before GPU computation
+3. Results prefetched back to CPU for validation
+4. Uses cudaMemPrefetchAsync for optimal data locality
+=== CUDA Matrix Multiplication with Unified Memory + Prefetching ===
+Size     CPU_Time(ms) GPU_Time(ms) Speedup      Bandwidth    Validation   GFLOPS      
+----     ------------ ------------ -------      ---------    ----------   ------      
+
+=== Problem Size: 32x32x32 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (2, 2), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 32x32x32
+CPU Time: 0.01 ms
+GPU Time: 0.16 ms
+Speedup: 0.05x
+Memory Bandwidth: 0.08 GB/s
+Performance: 0.41 GFLOPS
+Validation: PASSED
+Summary  0.01         0.16         0.05        x 0.08         PASSED       0.41        
+
+
+=== Problem Size: 64x64x64 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (4, 4), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 64x64x64
+CPU Time: 0.05 ms
+GPU Time: 0.13 ms
+Speedup: 0.35x
+Memory Bandwidth: 0.38 GB/s
+Performance: 4.03 GFLOPS
+Validation: PASSED
+Summary  0.05         0.13         0.35        x 0.38         PASSED       4.03        
+
+
+=== Problem Size: 128x128x128 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (8, 8), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 128x128x128
+CPU Time: 0.34 ms
+GPU Time: 0.13 ms
+Speedup: 2.63x
+Memory Bandwidth: 1.52 GB/s
+Performance: 32.51 GFLOPS
+Validation: PASSED
+Summary  0.34         0.13         2.63        x 1.52         PASSED       32.51       
+
+
+=== Problem Size: 256x256x256 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (16, 16), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 256x256x256
+CPU Time: 2.58 ms
+GPU Time: 0.25 ms
+Speedup: 10.26x
+Memory Bandwidth: 3.12 GB/s
+Performance: 133.20 GFLOPS
+Validation: PASSED
+Summary  2.58         0.25         10.26       x 3.12         PASSED       133.20      
+
+
+=== Problem Size: 512x512x512 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (32, 32), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 512x512x512
+CPU Time: 20.31 ms
+GPU Time: 1.04 ms
+Speedup: 19.52x
+Memory Bandwidth: 3.02 GB/s
+Performance: 258.02 GFLOPS
+Validation: PASSED
+Summary  20.31        1.04         19.52       x 3.02         PASSED       258.02      
+
+
+=== Problem Size: 1024x1024x1024 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (64, 64), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 1024x1024x1024
+CPU Time: 173.99 ms
+GPU Time: 5.35 ms
+Speedup: 32.51x
+Memory Bandwidth: 2.35 GB/s
+Performance: 401.22 GFLOPS
+Validation: PASSED
+Summary  173.99       5.35         32.51       x 2.35         PASSED       401.22      
+
+
+=== Problem Size: 2048x2048x2048 ===
+Prefetching data to CPU...
+Running CPU computation...
+Grid size: (128, 128), Block size: (16, 16)
+Prefetching data to GPU...
+Running GPU computation...
+Prefetching results to CPU for validation...
+Problem Size: 2048x2048x2048
+CPU Time: 1371.50 ms
+GPU Time: 40.87 ms
+Speedup: 33.56x
+Memory Bandwidth: 1.23 GB/s
+Performance: 420.32 GFLOPS
+Validation: PASSED
+Summary  1371.50      40.87        33.56       x 1.23         PASSED       420.32      
+

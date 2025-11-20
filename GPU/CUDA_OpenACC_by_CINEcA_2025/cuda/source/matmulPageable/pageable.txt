@@ -1,0 +1,169 @@
+
+=== Device Information ===
+Device: NVIDIA A100-SXM-64GB
+Compute Capability: 8.0
+Global Memory: 63.42 GB
+Shared Memory per Block: 49152 bytes
+Max Threads per Block: 1024
+Multiprocessors: 124
+Memory Clock Rate: 1.59 GHz
+Memory Bus Width: 4096 bits
+Peak Memory Bandwidth: 1631.23 GB/s
+
+--------------------------------------------------------
+
+=== Memory Prefetching Strategy ===
+1. Data prefetched to CPU before CPU computation
+2. Data prefetched to GPU before GPU computation
+3. Results prefetched back to CPU for validation
+4. Uses cudaMemPrefetchAsync for optimal data locality
+=== CUDA Matrix Multiplication with Pageable Memory Transfer ===
+Size     CPU_Time(ms) GPU_Time(ms) Transfer(ms) Speedup      Bandwidth    Validation   GFLOPS      
+----     ------------ ------------ -----------  -------      ---------    ----------   ------      
+
+=== Problem Size: 32x32x32 ===
+Running CPU computation...
+Grid size: (2, 2), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 32x32x32
+CPU Time: 0.01 ms
+GPU Compute Time: 0.04 ms
+Host->Device Transfer: 0.03 ms (0.41 GB/s)
+Device->Host Transfer: 0.02 ms (0.24 GB/s)
+Total Transfer Time: 0.05 ms
+Total GPU Time (Compute + Transfer): 0.08 ms
+Speedup: 0.06x
+Compute Memory Bandwidth: 0.32 GB/s
+Performance: 1.73 GFLOPS
+Validation: PASSED
+Summary  0.01         0.08         0.05         0.06        x 0.32         PASSED       1.73        
+
+
+=== Problem Size: 64x64x64 ===
+Running CPU computation...
+Grid size: (4, 4), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 64x64x64
+CPU Time: 0.03 ms
+GPU Compute Time: 0.07 ms
+Host->Device Transfer: 0.03 ms (1.56 GB/s)
+Device->Host Transfer: 0.01 ms (1.14 GB/s)
+Total Transfer Time: 0.05 ms
+Total GPU Time (Compute + Transfer): 0.11 ms
+Speedup: 0.23x
+Compute Memory Bandwidth: 0.72 GB/s
+Performance: 7.64 GFLOPS
+Validation: PASSED
+Summary  0.03         0.11         0.05         0.23        x 0.72         PASSED       7.64        
+
+
+=== Problem Size: 128x128x128 ===
+Running CPU computation...
+Grid size: (8, 8), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 128x128x128
+CPU Time: 0.23 ms
+GPU Compute Time: 0.13 ms
+Host->Device Transfer: 0.06 ms (3.08 GB/s)
+Device->Host Transfer: 0.03 ms (2.35 GB/s)
+Total Transfer Time: 0.09 ms
+Total GPU Time (Compute + Transfer): 0.22 ms
+Speedup: 1.02x
+Compute Memory Bandwidth: 1.52 GB/s
+Performance: 32.51 GFLOPS
+Validation: PASSED
+Summary  0.23         0.22         0.09         1.02        x 1.52         PASSED       32.51       
+
+
+=== Problem Size: 256x256x256 ===
+Running CPU computation...
+Grid size: (16, 16), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 256x256x256
+CPU Time: 1.86 ms
+GPU Compute Time: 0.25 ms
+Host->Device Transfer: 0.10 ms (7.86 GB/s)
+Device->Host Transfer: 0.06 ms (4.09 GB/s)
+Total Transfer Time: 0.16 ms
+Total GPU Time (Compute + Transfer): 0.42 ms
+Speedup: 4.47x
+Compute Memory Bandwidth: 3.13 GB/s
+Performance: 133.75 GFLOPS
+Validation: PASSED
+Summary  1.86         0.42         0.16         4.47        x 3.13         PASSED       133.75      
+
+
+=== Problem Size: 512x512x512 ===
+Running CPU computation...
+Grid size: (32, 32), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 512x512x512
+CPU Time: 18.40 ms
+GPU Compute Time: 1.04 ms
+Host->Device Transfer: 0.42 ms (7.58 GB/s)
+Device->Host Transfer: 0.18 ms (5.67 GB/s)
+Total Transfer Time: 0.60 ms
+Total GPU Time (Compute + Transfer): 1.64 ms
+Speedup: 11.19x
+Compute Memory Bandwidth: 3.01 GB/s
+Performance: 257.26 GFLOPS
+Validation: PASSED
+Summary  18.40        1.64         0.60         11.19       x 3.01         PASSED       257.26      
+
+
+=== Problem Size: 1024x1024x1024 ===
+Running CPU computation...
+Grid size: (64, 64), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 1024x1024x1024
+CPU Time: 159.56 ms
+GPU Compute Time: 5.34 ms
+Host->Device Transfer: 1.09 ms (11.56 GB/s)
+Device->Host Transfer: 0.48 ms (8.82 GB/s)
+Total Transfer Time: 1.56 ms
+Total GPU Time (Compute + Transfer): 6.90 ms
+Speedup: 23.12x
+Compute Memory Bandwidth: 2.36 GB/s
+Performance: 402.37 GFLOPS
+Validation: PASSED
+Summary  159.56       6.90         1.56         23.12       x 2.36         PASSED       402.37      
+
+
+=== Problem Size: 2048x2048x2048 ===
+Running CPU computation...
+Grid size: (128, 128), Block size: (16, 16)
+Transferring data from Host to Device...
+Running GPU computation...
+Transferring results from Device to Host...
+Validating results...
+Problem Size: 2048x2048x2048
+CPU Time: 1315.74 ms
+GPU Compute Time: 40.76 ms
+Host->Device Transfer: 4.67 ms (10.79 GB/s)
+Device->Host Transfer: 1.68 ms (10.01 GB/s)
+Total Transfer Time: 6.34 ms
+Total GPU Time (Compute + Transfer): 47.10 ms
+Speedup: 27.93x
+Compute Memory Bandwidth: 1.23 GB/s
+Performance: 421.46 GFLOPS
+Validation: PASSED
+Summary  1315.74      47.10        6.34         27.93       x 1.23         PASSED       421.46      
+

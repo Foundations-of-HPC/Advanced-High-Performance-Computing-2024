@@ -1,0 +1,1 @@
+/var/spool/slurmd/job3009228/slurm_script: line 28: OMP_NUM_THREADS: command not found
